@@ -79,9 +79,9 @@
   </g>
 
   <g fill="#89d9ec" font-family="monospace" font-size="11" letter-spacing="1.1">
-    <text x="75" y="137">01 / ШАССИ</text>
-    <text x="430" y="128">02 / ЖЕТЕК</text>
-    <text x="405" y="349">03 / МОДУЛЬ</text>
+    <text x="75" y="137">01 / CHASSIS</text>
+    <text x="430" y="128">02 / DRIVETRAIN</text>
+    <text x="405" y="349">03 / MODULE</text>
     <text x="80" y="350" fill-opacity=".63">FTC / 01</text>
   </g>
   <g stroke="#6ad5ed" opacity=".65">
