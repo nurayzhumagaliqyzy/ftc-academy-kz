@@ -142,10 +142,15 @@ test('teacher resources and mobile navigation render without page overflow', asy
   await lessons.first().focus()
   await page.keyboard.press('Enter')
   await expect(page.locator('.hw-plan[open] li')).toHaveCount(5)
-  for (const route of ['teacher', 'explorer', 'wiring', 'quiz', 'troubleshooting']) {
-    await page.goto(base + '#hardware/' + route)
-    await expect(page.locator('.hw-tabs [aria-current="page"]')).toBeVisible()
-    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360)
+  for (const width of [360, 280]) {
+    await page.setViewportSize({ width, height: 800 })
+    for (const route of ['teacher', 'explorer', 'wiring', 'quiz', 'troubleshooting']) {
+      const hash = '#hardware/' + route
+      await page.goto(base + hash)
+      await expect(page.locator('.hw-tabs [aria-current="page"]')).toHaveAttribute('href', hash)
+      const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth)
+      expect(scrollWidth, route + ' at ' + width + 'px').toBeLessThanOrEqual(width)
+    }
   }
   await page.getByRole('button', { name: 'Мәзірді ашу' }).click()
   await expect(page.getByRole('navigation', { name: 'Бүйірлік мәзір' })).toBeVisible()
