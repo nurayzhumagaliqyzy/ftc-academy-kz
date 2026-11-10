@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 570 420" fill="none">
+  <defs>
+    <radialGradient id="halo">
+      <stop stop-color="#1599bd" stop-opacity=".31"/>
+      <stop offset="1" stop-color="#1599bd" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="metal" x1="140" y1="155" x2="350" y2="295" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#174762"/>
+      <stop offset="1" stop-color="#102039"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="150" y1="100" x2="435" y2="310" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#91f0ff"/>
+      <stop offset="1" stop-color="#278dab"/>
+    </linearGradient>
+    <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse">
+      <path d="M28 0H0v28" stroke="#3a9ebc" stroke-opacity=".16"/>
+    </pattern>
+    <mask id="fade">
+      <rect width="570" height="420" fill="url(#grid-fade)"/>
+    </mask>
+    <radialGradient id="grid-fade">
+      <stop offset=".38" stop-color="white"/>
+      <stop offset="1" stop-color="black"/>
+    </radialGradient>
+    <g id="wheel">
+      <path d="M8-27h15c12 0 20 12 20 27s-8 27-20 27H8z" fill="#09182d" stroke="#358eaa"/>
+      <ellipse cx="8" cy="0" rx="20" ry="27" fill="#0c2137" stroke="#5bbcd0"/>
+      <ellipse cx="8" cy="0" rx="14" ry="20" stroke="#3686a3"/>
+      <ellipse cx="8" cy="0" rx="7" ry="10" fill="#153d53" stroke="#66cddf"/>
+      <path d="M5-18 8-10m11-2-6 6m7 13-7-3m-5 6-3 8M2 4l-7 5m7-14-6-7M29-25l-7 4m13 3-7 4m12 4-8 4m10 6-9 4m8 7-9 4m4 4-9 5" stroke="#398aa4" stroke-linecap="round"/>
+    </g>
+  </defs>
+
+  <rect width="570" height="420" fill="url(#grid)" mask="url(#fade)"/>
+  <ellipse cx="304" cy="219" rx="254" ry="195" fill="url(#halo)"/>
+
+  <g stroke="#38839e" stroke-opacity=".46">
+    <circle cx="302" cy="212" r="165" stroke-dasharray="3 6"/>
+    <circle cx="302" cy="212" r="144"/>
+    <path d="M302 34v357M122 212h365M159 343l271-239M155 84l284 258" stroke-dasharray="4 7"/>
+    <path d="M78 103V65h38m353 0h37v38M78 323v38h38m353 0h37v-38"/>
+    <path d="m124 303 165-73 170 65-164 81zM155 289l170 73m-136-88 172 70m-139-85 171 68m-136-85 171 69m-267 6 163-73m-131 87 167-73m-134 87 170-73m-134 89 168-75"/>
+  </g>
+
+  <g stroke="#73dcf1" stroke-width="1.2" fill="none" opacity=".83">
+    <path d="M66 149h53l37 47m324-56h-49l-39 42m76 148h-51l-35-44"/>
+    <circle cx="66" cy="149" r="3" fill="#51e5f8"/>
+    <circle cx="480" cy="140" r="3" fill="#51e5f8"/>
+    <circle cx="468" cy="330" r="3" fill="#51e5f8"/>
+  </g>
+
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <use href="#wheel" transform="translate(301 205) rotate(14) scale(.84)"/>
+    <use href="#wheel" transform="translate(407 247) rotate(14) scale(.93)"/>
+    <path d="m134 226 158-68 139 51-154 76z" fill="url(#metal)" stroke="url(#edge)" stroke-width="2"/>
+    <path d="m134 226 143 59v29l-143-60zm143 59 154-76v27l-154 78z" fill="#10283c" stroke="#54b4cc" stroke-width="1.6"/>
+    <path d="m148 244 116 49m27 2 127-62m-262-10 139-58 114 44-133 66z" stroke="#3e93ab" stroke-width="1.4"/>
+    <path d="m169 229 110-48 105 40m-158 31 102-52m-70 63 104-51m-174 8 112 46m-84-58 112 44m-86-56 112 43" stroke="#459ab1" stroke-opacity=".67"/>
+    <path d="m165 222 123-53 10 4-123 54zm106 41 126-60 10 5-126 61z" fill="#21516a" stroke="#73cfe1"/>
+    <path d="m211 214 84-38 70 26-82 42z" fill="#0b2033" stroke="#5dbbd0" stroke-width="1.4"/>
+    <path d="m211 214 72 30v12l-72-30zm72 30 82-42v12l-82 42z" fill="#102c43" stroke="#4298ae"/>
+    <path d="m228 216 31-14 22 9-30 15zm38-17 28-13 21 8-27 14zm24 20 32-16 19 8-31 16z" fill="#17516b" stroke="#58bbd1"/>
+    <path d="m236 216 14 6m31-24 12 4m11 15 10 4m-23 28 21-11m7-4 15-7" stroke="#71e9f8" stroke-width="1.6"/>
+    <use href="#wheel" transform="translate(137 263) rotate(14)"/>
+    <use href="#wheel" transform="translate(246 307) rotate(14) scale(1.08)"/>
+    <path d="m317 276 25-12 12 5-25 13zm0 0v16l12 5v-15zm12 21 25-13v-15" fill="#123d53" stroke="#66bbcf"/>
+    <path d="m367 252 42-21v10l-42 21z" fill="#17364e" stroke="#469cb5"/>
+    <path d="m375 253 10-5m9-4 8-4" stroke="#6de3ee"/>
+
+    <path d="m296 179 10-4 8 3v-62l-18-7zm18-63 8-4v64l-8 4z" fill="#153b53" stroke="#59b3ca" stroke-width="1.5"/>
+    <path d="m297 108 8-5 17 9-8 4zm4 10v53m18-51v49" stroke="#69c8da"/>
+    <path d="m306 117 44-40 17 7-42 42z" fill="#1b4b65" stroke="url(#edge)" stroke-width="1.8"/>
+    <path d="m306 117 19 9v12l-19-9zm19 9 42-42v12l-42 42z" fill="#15394f" stroke="#5ab5cd" stroke-width="1.4"/>
+    <path d="m330 126 31-31m-46 25 35-33" stroke="#79e3ef"/>
+    <path d="m359 84 17-15 15 6-15 15zm17 6 15-15v16l-15 16zm-17-6 17 6v17l-17-7z" fill="#123349" stroke="#70cce2" stroke-width="1.6"/>
+    <path d="m377 105 14 6 11-10v-9m-29 10v10l-9 8-8-4" stroke="#7be4f3" stroke-width="2"/>
+    <path d="M319 186c7 7 7 14-9 18" stroke="#5dd7ea" stroke-width="2"/>
+    <circle cx="312" cy="122" r="3.8" fill="#3dd5e7" stroke="#a1f3ff"/>
+  </g>
+
+  <g fill="#89d9ec" font-family="monospace" font-size="11" letter-spacing="1.1">
+    <text x="75" y="137">01 / ШАССИ</text>
+    <text x="430" y="128">02 / ЖЕТЕК</text>
+    <text x="405" y="349">03 / МОДУЛЬ</text>
+    <text x="80" y="350" fill-opacity=".63">FTC / 01</text>
+  </g>
+  <g stroke="#6ad5ed" opacity=".65">
+    <path d="M103 88h12m-6-6v12m355 1h12m-6-6v12M114 314h12m-6-6v12m364-32h12m-6-6v12"/>
+  </g>
+</svg>
