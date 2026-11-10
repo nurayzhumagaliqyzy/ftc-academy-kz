@@ -18,6 +18,7 @@ export function TeacherMode() {
           <p>Болашақ информатика мұғалімдері үшін. Құрылғыны меңгерумен қатар, оқушының қате түсінігін анықтап, оған тексеру қадамын ұсынуды үйрен.</p></div>
         <span className="hw-count">2 × 50 минут</span>
       </div>
+      <p>Сабақтарда Control Hub (басқару блогы), DC Motor (тұрақты ток қозғалтқышы), Encoder (айналымды өлшейтін құрылғы), Servo Motor (сервоқозғалтқыш) және Sensor (датчик) қолданылады.</p>
       <div className="hw-teacher-grid">
         <TeachingList title="Оқу мақсаттары" items={teacher.objectives} />
         <TeachingList title="Сыныптағы тапсырмалар" items={teacher.activities} ordered />

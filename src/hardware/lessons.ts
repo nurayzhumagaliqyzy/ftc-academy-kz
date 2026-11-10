@@ -35,7 +35,7 @@ export const questions = [
   {
     id: 'servo-plug', prompt: 'Servo Motor кабелін қосар алдында нені тексеру керек?',
     options: ['Тек кабельдің ұзындығын', 'Motor портының нөмірін', 'I2C мекенжайын', 'Ground, қорек және сигнал түйіспелерінің сәйкестігін'],
-    answer: 3, explanation: 'Ground (жерлендіру), қорек пен сигнал орналасуын Control Hub таңбасымен және Servo Motor құжатымен салыстыр. Үш түйіспелі қосқышты кері орнатуға болады.',
+    answer: 3, explanation: 'Ground (ортақ 0 В түйіспесі), қорек пен сигнал орналасуын Control Hub таңбасымен және Servo Motor құжатымен салыстыр. Үш түйіспелі қосқышты кері орнатуға болады.',
   },
   {
     id: 'i2c-conflict', prompt: 'REV Color Sensor V3 және REV 2m Distance Sensor үшін қай жалғау дұрыс?',
@@ -99,7 +99,7 @@ export const scenarios = [
     id: 'servo-stopped', title: 'Servo Motor қозғалмайды',
     symptom: 'Қысқышты ашу батырмасы басылғанда позициялық Servo Motor көрінетін қозғалыс жасамайды.',
     choices: [
-      { label: 'Servo Motor қосқышының бағыты қате.', plausible: true, feedback: 'Ground (жерлендіру), қорек пен сигналды порт таңбасына сай тексеру қажет.' },
+      { label: 'Servo Motor қосқышының бағыты қате.', plausible: true, feedback: 'Ground (ортақ 0 В түйіспесі), қорек пен сигналды порт таңбасына сай тексеру қажет.' },
       { label: 'Servo Motor-ға міндетті түрде бөлек Encoder кабелі жетіспейді.', plausible: false, feedback: 'Бұл жаттығудағы стандартты позициялық Servo Motor үш түйіспелі Servo порты арқылы басқарылады.' },
       { label: 'Басқа Servo порты Robot Configuration ішінде таңдалған.', plausible: true, feedback: 'Бағдарлама команданы нақты құрылғы тұрған арнаға жіберуі керек.' },
       { label: 'Бағдарлама бұрынғы қалыпты қайта беріп тұр немесе қысқыш тірелген.', plausible: true, feedback: 'Бірдей қалып қозғалыс тудырмайды. Механикалық тірелуді де бөлек тексер.' },
