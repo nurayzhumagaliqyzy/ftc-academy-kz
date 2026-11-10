@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import mark from './assets/mark.svg'
 import robot from './assets/robot.svg'
+import { HardwareModule, hardwareSectionFor } from './hardware/HardwareModule'
 
 const iconPaths = {
   home: 'M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
@@ -40,16 +41,16 @@ const courses: Course[] = [
     title: 'FTC Hardware',
     label: 'Робот құрылғылары',
     icon: 'chip',
-    description: 'FTC роботының негізгі бөлшектерімен таныс. Chassis, motor және sensor не үшін қолданылатынын түсін.',
-    topics: ['Chassis және drivetrain', 'Control Hub жүйесіне motor қосу', 'Sensor түрлері және қызметі'],
+    description: 'Chassis (шасси), Control Hub (басқару блогы) және басқа FTC бөлшектерін танып, қосылымдарды сына.',
+    topics: ['Chassis және Drivetrain (жүріс жүйесі)', 'DC Motor (тұрақты ток қозғалтқышы) қосу', 'Sensor (датчик) түрлері және қызметі'],
   },
   {
     id: 'programming',
     title: 'FTC Programming',
     label: 'Бағдарламалау',
     icon: 'code',
-    description: 'FTC SDK ортасымен танысып, Java тілінде TeleOp және Autonomous режимдеріне арналған бағдарлама жазуды үйрен.',
-    topics: ['FTC SDK және OpMode', 'Gamepad арқылы басқару (TeleOp)', 'Autonomous режимінде қозғалысты басқару'],
+    description: 'FTC SDK (бағдарламалық әзірлеу жинағы) ортасымен танысып, Java тілінде TeleOp (оператор басқаратын режим) және Autonomous (автономды режим) бағдарламаларын жазуды үйрен.',
+    topics: ['FTC SDK және OpMode (роботты басқару бағдарламасы)', 'Gamepad (ойын контроллері) арқылы басқару', 'Autonomous режимінде қозғалысты басқару'],
   },
   {
     id: 'simulator',
@@ -80,6 +81,9 @@ function CourseCard({ course, index }: { course: Course; index: number }) {
         ) : (
           <div className="coming-soon"><Icon name="clock" size={16} /> Жоспарда</div>
         )}
+        {course.id === 'hardware' && (
+          <a className="primary-link hw-course-link" href="#hardware/explorer">FTC Hardware <Icon name="arrow" size={16} /></a>
+        )}
       </div>
     </article>
   )
@@ -89,6 +93,8 @@ export function App() {
   const [active, setActive] = useState(() => window.location.hash.slice(1) || 'home')
   const [menuOpen, setMenuOpen] = useState(false)
   const menuButton = useRef<HTMLButtonElement>(null)
+  const hardwareSection = hardwareSectionFor(active)
+  const wasInHardware = useRef(Boolean(hardwareSection))
 
   useEffect(() => {
     function updateActive() {
@@ -98,6 +104,15 @@ export function App() {
     window.addEventListener('hashchange', updateActive)
     return () => window.removeEventListener('hashchange', updateActive)
   }, [])
+
+  useEffect(() => {
+    if (wasInHardware.current && !hardwareSection) {
+      const destination = document.getElementById(active) ?? document.getElementById('home')
+      destination?.focus({ preventScroll: true })
+      destination?.scrollIntoView({ block: 'start' })
+    }
+    wasInHardware.current = Boolean(hardwareSection)
+  }, [active, hardwareSection])
 
   function closeMenuOnEscape(event: KeyboardEvent) {
     if (event.key === 'Escape' && menuOpen) {
@@ -134,7 +149,7 @@ export function App() {
           </a>
           <p className="nav-heading nav-course-heading">ОҚУ БАҒЫТТАРЫ</p>
           {courses.map((course) => (
-            <a key={course.id} href={'#' + course.id} aria-current={active === course.id ? 'location' : undefined} onClick={() => setMenuOpen(false)}>
+            <a key={course.id} href={'#' + course.id} aria-current={active === course.id || (course.id === 'hardware' && hardwareSection) ? 'location' : undefined} onClick={() => setMenuOpen(false)}>
               <Icon name={course.icon} /> {course.id === 'simulator' ? 'Робот симуляторы' : course.label}
             </a>
           ))}
@@ -144,36 +159,42 @@ export function App() {
 
       <main id="main" className="main" tabIndex={-1}>
         <div className="content">
-          <header className="topline" id="home" tabIndex={-1}>
-            <span>АКАДЕМИЯ <span className="breadcrumb-divider">/</span> <strong>БАСТЫ БЕТ</strong></span>
-            <span className="language">ҚАЗ</span>
-          </header>
+          {hardwareSection ? (
+            <HardwareModule section={hardwareSection} />
+          ) : (
+            <>
+              <header className="topline" id="home" tabIndex={-1}>
+                <span>АКАДЕМИЯ <span className="breadcrumb-divider">/</span> <strong>БАСТЫ БЕТ</strong></span>
+                <span className="language">ҚАЗ</span>
+              </header>
 
-          <section className="hero" aria-labelledby="hero-title">
-            <div className="hero-copy">
-              <p className="eyebrow"><span /> FIRST TECH CHALLENGE</p>
-              <h1 id="hero-title">FTC робототехникасын <em>қазақша үйрен</em></h1>
-              <p className="hero-description">Роботтың құрылысын түсінуден бастап, оны басқаратын алғашқы бағдарламаңды жазуға дейін.</p>
-              <a className="primary-link" href="#courses">Оқу бағыттарын қарау <Icon name="arrow" size={18} /></a>
-            </div>
-            <div className="hero-art" aria-hidden="true">
-              <img src={robot} alt="" width="570" height="420" />
-            </div>
-          </section>
+              <section className="hero" aria-labelledby="hero-title">
+                <div className="hero-copy">
+                  <p className="eyebrow"><span /> FIRST TECH CHALLENGE</p>
+                  <h1 id="hero-title">FTC робототехникасын <em>қазақша үйрен</em></h1>
+                  <p className="hero-description">Роботтың құрылысын түсінуден бастап, оны басқаратын алғашқы бағдарламаңды жазуға дейін.</p>
+                  <a className="primary-link" href="#courses">Оқу бағыттарын қарау <Icon name="arrow" size={18} /></a>
+                </div>
+                <div className="hero-art" aria-hidden="true">
+                  <img src={robot} alt="" width="570" height="420" />
+                </div>
+              </section>
 
-          <section id="courses" className="courses" aria-labelledby="courses-title" tabIndex={-1}>
-            <div className="section-heading">
-              <div>
-                <p className="section-kicker">КУРСТАР</p>
-                <h2 id="courses-title">Оқу бағыттары</h2>
-                <p>Өзіңе қызық бағыттан баста.</p>
-              </div>
-              <span className="module-count">03 БАҒЫТ</span>
-            </div>
-            <div className="course-grid">
-              {courses.map((course, index) => <CourseCard key={course.id} course={course} index={index} />)}
-            </div>
-          </section>
+              <section id="courses" className="courses" aria-labelledby="courses-title" tabIndex={-1}>
+                <div className="section-heading">
+                  <div>
+                    <p className="section-kicker">КУРСТАР</p>
+                    <h2 id="courses-title">Оқу бағыттары</h2>
+                    <p>Өзіңе қызық бағыттан баста.</p>
+                  </div>
+                  <span className="module-count">03 БАҒЫТ</span>
+                </div>
+                <div className="course-grid">
+                  {courses.map((course, index) => <CourseCard key={course.id} course={course} index={index} />)}
+                </div>
+              </section>
+            </>
+          )}
 
           <footer className="main-footer"><span lang="en">FTC Academy KZ</span><span>Робототехника негіздері</span></footer>
         </div>
