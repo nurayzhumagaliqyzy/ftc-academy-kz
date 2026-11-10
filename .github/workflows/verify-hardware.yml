@@ -1,0 +1,40 @@
+name: Verify FTC Hardware
+
+on:
+  push:
+    branches: [verify-hardware-module]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Install project dependencies
+        run: npm install --no-audit --no-fund
+      - name: TypeScript and production build
+        run: npm run build
+      - name: Install browser test tooling
+        run: |
+          npm install --no-save --no-audit --no-fund @playwright/test
+          npx playwright install --with-deps chromium
+      - name: Test the production site
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 --strictPort > /tmp/ftc-preview.log 2>&1 &
+          vite_pid=$!
+          trap 'kill "$vite_pid" 2>/dev/null || true; cat /tmp/ftc-preview.log' EXIT
+          for attempt in {1..30}; do
+            if curl -fs http://127.0.0.1:4173/ > /dev/null; then break; fi
+            sleep 1
+          done
+          curl -fs http://127.0.0.1:4173/ > /dev/null
+          npx playwright test qa/hardware.spec.js --workers=1 --reporter=line
