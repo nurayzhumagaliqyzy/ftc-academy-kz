@@ -3,6 +3,7 @@ import type { KeyboardEvent } from 'react'
 import mark from './assets/mark.svg'
 import robot from './assets/robot.svg'
 import { HardwareModule, hardwareSectionFor } from './hardware/HardwareModule'
+import { ProgrammingLesson, isProgrammingLesson } from './programming/ProgrammingLesson'
 
 const iconPaths = {
   home: 'M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
@@ -84,6 +85,9 @@ function CourseCard({ course, index }: { course: Course; index: number }) {
         {course.id === 'hardware' && (
           <a className="primary-link hw-course-link" href="#hardware/explorer">FTC Hardware <Icon name="arrow" size={16} /></a>
         )}
+        {course.id === 'programming' && (
+          <a className="primary-link hw-course-link" href="#programming/sdk-opmode">1-сабақты ашу <Icon name="arrow" size={16} /></a>
+        )}
       </div>
     </article>
   )
@@ -94,7 +98,9 @@ export function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuButton = useRef<HTMLButtonElement>(null)
   const hardwareSection = hardwareSectionFor(active)
-  const wasInHardware = useRef(Boolean(hardwareSection))
+  const programmingLesson = isProgrammingLesson(active)
+  const inModule = Boolean(hardwareSection) || programmingLesson
+  const wasInModule = useRef(inModule)
 
   useEffect(() => {
     function updateActive() {
@@ -106,13 +112,13 @@ export function App() {
   }, [])
 
   useEffect(() => {
-    if (wasInHardware.current && !hardwareSection) {
+    if (wasInModule.current && !inModule) {
       const destination = document.getElementById(active) ?? document.getElementById('home')
       destination?.focus({ preventScroll: true })
       destination?.scrollIntoView({ block: 'start' })
     }
-    wasInHardware.current = Boolean(hardwareSection)
-  }, [active, hardwareSection])
+    wasInModule.current = inModule
+  }, [active, inModule])
 
   function closeMenuOnEscape(event: KeyboardEvent) {
     if (event.key === 'Escape' && menuOpen) {
@@ -123,7 +129,10 @@ export function App() {
 
   return (
     <div className="layout">
-      <a className="skip-link" href="#main">Мазмұнға өту</a>
+      <a className="skip-link" href="#main" onClick={event => {
+        event.preventDefault()
+        document.getElementById('main')?.focus()
+      }}>Мазмұнға өту</a>
       <aside className="sidebar" onKeyDown={closeMenuOnEscape}>
         <div className="sidebar-top">
           <a className="brand" href="#home" onClick={() => setMenuOpen(false)}>
@@ -149,7 +158,7 @@ export function App() {
           </a>
           <p className="nav-heading nav-course-heading">ОҚУ БАҒЫТТАРЫ</p>
           {courses.map((course) => (
-            <a key={course.id} href={'#' + course.id} aria-current={active === course.id || (course.id === 'hardware' && hardwareSection) ? 'location' : undefined} onClick={() => setMenuOpen(false)}>
+            <a key={course.id} href={course.id === 'programming' ? '#programming/sdk-opmode' : '#' + course.id} aria-current={active === course.id || (course.id === 'hardware' && hardwareSection) || (course.id === 'programming' && programmingLesson) ? 'location' : undefined} onClick={() => setMenuOpen(false)}>
               <Icon name={course.icon} /> {course.id === 'simulator' ? 'Робот симуляторы' : course.label}
             </a>
           ))}
@@ -161,6 +170,8 @@ export function App() {
         <div className="content">
           {hardwareSection ? (
             <HardwareModule section={hardwareSection} />
+          ) : programmingLesson ? (
+            <ProgrammingLesson />
           ) : (
             <>
               <header className="topline" id="home" tabIndex={-1}>
