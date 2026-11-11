@@ -24,7 +24,8 @@
 .pl-matches .hw-feedback { margin-bottom: 0; }
 .pl-question { margin: 0; padding-top: 5px; }
 .pl-question legend { max-width: 100%; padding: 0 6px; color: #e6f4ff; font-weight: 650; line-height: 1.6; }
-.pl-question .hw-option { flex-wrap: wrap; padding: 11px 12px; }
+.pl-question .hw-options { min-width: 0; grid-template-columns: minmax(0, 1fr); }
+.pl-question .hw-option { flex-wrap: wrap; min-width: 0; padding: 11px 12px; overflow-wrap: anywhere; }
 .pl-question .hw-option small { font-size: .75rem; }
 .pl-question .hw-feedback { margin-bottom: 8px; }
 .pl-quiz-summary { margin-top: 14px; }
@@ -39,3 +40,11 @@
   .pl-jumps .hw-button { flex: 1 1 130px; }
   .pl-matches select { font-size: .82rem; padding-inline: 7px; }
 }
+
+.pl-lesson-pager { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; }
+.pl-lesson-pager a { flex: 1 1 220px; }
+.pl-lesson-tabs a { text-align: left; }
+.pl-lesson-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.pl-lesson-grid > article { display: flex; flex-direction: column; align-items: start; gap: 8px; }
+.pl-lesson-grid .primary-link { margin-top: auto; }
+@media (max-width: 720px) { .pl-lesson-grid { grid-template-columns: minmax(0, 1fr); } }

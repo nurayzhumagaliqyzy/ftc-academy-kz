@@ -5,11 +5,8 @@ import {
   progressPercent, questions, quizPassed, quizScore, readingSections, saveProgress,
 } from './model'
 import type { Progress, ReadingId } from './model'
+import { LessonNavigation, LessonQuiz, ReadingSection as SharedReadingSection } from './LessonComponents'
 import './programming.css'
-
-export function isProgrammingLesson(hash: string) {
-  return hash === 'programming/sdk-opmode'
-}
 
 const javaExample = `package org.firstinspires.ftc.teamcode;
 
@@ -43,16 +40,7 @@ function ReadingSection({ id, read, onRead, children }: {
   id: ReadingId; read: boolean; onRead: () => void; children: ReactNode
 }) {
   const section = readingSections.find(item => item.id === id)!
-  return (
-    <section className="hw-panel" aria-labelledby={'pl-' + id}>
-      <p className="hw-kicker">ТЕОРИЯ / 0{readingSections.indexOf(section) + 1}</p>
-      <h2 id={'pl-' + id} tabIndex={-1}>{section.title}</h2>
-      {children}
-      <button className="hw-button hw-button-secondary pl-read" type="button" aria-pressed={read} onClick={onRead}>
-        {read ? '✓ Оқылды' : 'Оқыдым, түсіндім'}
-      </button>
-    </section>
-  )
+  return <SharedReadingSection id={'pl-' + id} title={section.title} index={readingSections.indexOf(section) + 1} read={read} onRead={onRead}>{children}</SharedReadingSection>
 }
 
 export function ProgrammingLesson() {
@@ -97,6 +85,8 @@ export function ProgrammingLesson() {
         <p>Робот бағдарламасының құрылымын түсін. Ұғымдарды сәйкестендіріп, біліміңді тексер.</p>
         <div className="pl-meta"><span>Бастапқы деңгей · 9-сынып</span><span>Шамамен 30–40 минут</span></div>
       </div>
+
+      <LessonNavigation current="sdk-opmode" />
 
       <section className="hw-panel pl-progress" aria-labelledby="pl-progress-title">
         <div className="hw-section-head">
@@ -196,51 +186,12 @@ export function ProgrammingLesson() {
         </div>
       </section>
 
-      <section className="hw-panel" aria-labelledby="pl-quiz">
-        <div className="hw-section-head"><div><p className="hw-kicker">ӨЗІҢДІ ТЕКСЕР / 02</p><h2 id="pl-quiz" tabIndex={-1}>Бес сұрақтық тест</h2></div><span className="hw-count">{score}/5 дұрыс</span></div>
-        <p>Әр сұрақта бір дұрыс жауап бар. Жауапты басқан бойда нәтиже мен түсіндірме ашылады. Аяқтау үшін барлық сұраққа жауап беріп, кемінде 4/5 жина. Қажет болса, тестті қайта баста.</p>
-        <div className="pl-questions">
-          {questions.map((question, index) => {
-            const answer = progress.answers[question.id]
-            const hasAnswer = answer !== undefined
-            return (
-              <fieldset className="hw-question pl-question" key={question.id}>
-                <legend>{index + 1}. {question.prompt}</legend>
-                <div className="hw-options">
-                  {question.options.map((option, optionIndex) => (
-                    <button key={option} type="button" className="hw-option" disabled={hasAnswer}
-                      aria-pressed={answer === optionIndex}
-                      data-result={hasAnswer && optionIndex === question.answer ? 'correct' : answer === optionIndex ? 'wrong' : undefined}
-                      onClick={() => update(previous => previous.answers[question.id] !== undefined ? previous : {
-                        ...previous, answers: { ...previous.answers, [question.id]: optionIndex },
-                      })}>
-                      <span aria-hidden="true">{String.fromCharCode(65 + optionIndex)}</span>
-                      {option}
-                      {hasAnswer && optionIndex === question.answer && <small>✓ Дұрыс жауап</small>}
-                      {answer === optionIndex && optionIndex !== question.answer && <small>Сенің жауабың</small>}
-                    </button>
-                  ))}
-                </div>
-                <div aria-live="polite" aria-atomic="true">
-                  {hasAnswer && <div className="hw-feedback" data-kind={answer === question.answer ? 'good' : 'bad'}>
-                    <strong>{answer === question.answer ? '✓ Дұрыс!' : 'Бұл жауап қате.'}</strong><p>{question.explanation}</p>
-                  </div>}
-                </div>
-              </fieldset>
-            )
-          })}
-        </div>
-        <div className="pl-quiz-summary" aria-live="polite">
-          {answered === 5 && <p className="hw-feedback" data-kind={quizPassed(progress) ? 'good' : 'bad'}>
-            {quizPassed(progress) ? `Тесттен өттің! Нәтиже: ${score}/5.` : `Нәтиже: ${score}/5. Түсіндірмелерді оқып, тестті қайта орында.`}
-          </p>}
-        </div>
-        <button className="hw-button hw-button-secondary" type="button" disabled={answered === 0} onClick={() => {
-          update(previous => ({ ...previous, answers: {}, completed: false }))
-          jumpTo('quiz')
-        }}>Тестті қайта бастау</button>
-        <p className="hw-muted pl-retry-note">Қайта бастағанда тест жауаптары мен сабақтың аяқталу белгісі жаңартылады. Теория және сәйкестендіру сақталады.</p>
-      </section>
+      <LessonQuiz id="pl-quiz" questions={questions} answers={progress.answers}
+        onAnswer={(id, answer) => update(previous => previous.answers[id] !== undefined ? previous : {
+          ...previous, answers: { ...previous.answers, [id]: answer },
+        })}
+        onRetry={() => update(previous => ({ ...previous, answers: {}, completed: false }))}
+        retryNote="Қайта бастағанда тест жауаптары мен сабақтың аяқталу белгісі жаңартылады. Теория және сәйкестендіру сақталады." />
 
       <section className="hw-panel" aria-labelledby="pl-completion">
         <h2 id="pl-completion" tabIndex={-1}>Сабақты аяқтау</h2>
@@ -259,6 +210,8 @@ export function ProgrammingLesson() {
           </p>
         </div>
       </section>
+
+      <LessonNavigation current="sdk-opmode" pager />
 
       <aside className="hw-panel hw-sources" aria-labelledby="pl-sources">
         <h2 id="pl-sources">Ресми дереккөздер</h2>
