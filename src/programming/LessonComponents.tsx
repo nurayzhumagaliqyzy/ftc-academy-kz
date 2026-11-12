@@ -86,18 +86,18 @@ export function LessonQuiz({ id, questions, answers, onAnswer, onRetry, retryNot
 }
 
 export type CodeTask = { id: string; prompt: string; before: string; after: string; options: readonly string[]; answer: string; explanation: string }
-export function LessonCodeExercise({ id, tasks, answers, onChange }: {
-  id: string; tasks: readonly CodeTask[]; answers: Record<string, string>; onChange: (id: string, value: string) => void
+export function LessonCodeExercise({ id, tasks, answers, onChange, title = 'TeleOp кодын толықтыр' }: {
+  id: string; title?: string; tasks: readonly CodeTask[]; answers: Record<string, string>; onChange: (id: string, value: string) => void
 }) {
   return <section className="hw-panel" aria-labelledby={id}>
-    <div className="hw-section-head"><div><p className="hw-kicker">JAVA / БОС ОРЫНДЫ ТОЛТЫР</p><h2 id={id} tabIndex={-1}>TeleOp кодын толықтыр</h2></div><span className="hw-count">{tasks.filter(task => answers[task.id] === task.answer).length}/{tasks.length} дұрыс</span></div>
+    <div className="hw-section-head"><div><p className="hw-kicker">JAVA / БОС ОРЫНДЫ ТОЛТЫР</p><h2 id={id} tabIndex={-1}>{title}</h2></div><span className="hw-count">{tasks.filter(task => answers[task.id] === task.answer).length}/{tasks.length} дұрыс</span></div>
     <p>Әр үзіндіге сәйкес Java бөлігін таңда. Қате жауапты өзгерте аласың. Бұл — оқу тапсырмасы, Java компиляторы емес; код орындалмайды.</p>
     <div className="pl-matches">
       {tasks.map((task, index) => {
         const selected = answers[task.id] ?? ''
         return <div className="hw-detail" key={task.id}>
           <label className="pl-match-label" htmlFor={`${id}-${task.id}`}>{index + 1}. {task.prompt}</label>
-          <pre className="gl-live-code"><code lang="en">{task.before}<mark>{selected || '___'}</mark>{task.after}</code></pre>
+          <pre className="pl-exercise-code"><code lang="en">{task.before}<mark>{selected || '___'}</mark>{task.after}</code></pre>
           <select id={`${id}-${task.id}`} value={selected} aria-describedby={selected ? `${id}-${task.id}-feedback` : undefined} onChange={event => onChange(task.id, event.target.value)}>
             <option value="">Java бөлігін таңда…</option>{task.options.map(option => <option key={option} value={option}>{option}</option>)}
           </select>

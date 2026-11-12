@@ -48,3 +48,5 @@
 .pl-lesson-grid > article { display: flex; flex-direction: column; align-items: start; gap: 8px; }
 .pl-lesson-grid .primary-link { margin-top: auto; }
 @media (max-width: 720px) { .pl-lesson-grid { grid-template-columns: minmax(0, 1fr); } }
+
+.pl-exercise-code { max-width:100%; overflow:auto; padding:16px; background:#071321; border:1px solid #2e506a; border-radius:12px; color:#a7e8f1; font-size:13px; }
