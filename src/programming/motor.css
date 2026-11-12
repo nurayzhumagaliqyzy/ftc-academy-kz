@@ -1,0 +1,41 @@
+.ml-lab-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 24px; align-items: start; }
+.ml-motor-stage { --ml-signal: #90a9c1; min-width: 0; padding: 18px; border: 1px solid #36536c; border-radius: 14px; background: radial-gradient(ellipse at 50% 40%, #164055, transparent 68%), #0a1729; }
+.ml-motor-stage[data-sign='positive'] { --ml-signal: #63e4f4; }
+.ml-motor-stage[data-sign='negative'] { --ml-signal: #cfb5ff; }
+.ml-stage-heading { display: flex; gap: 8px; align-items: center; justify-content: space-between; color: #9abbd2; font: .66rem/1.5 var(--mono); letter-spacing: .06em; }
+.ml-led { flex: none; width: 8px; height: 8px; border-radius: 50%; background: #6b7d91; }
+.ml-led[data-active='true'] { background: var(--ml-signal); box-shadow: 0 0 16px var(--ml-signal); }
+.ml-motor-drawing { position: relative; max-width: 340px; margin: 8px auto 0; overflow: hidden; }
+.ml-motor-base { width: 100%; height: auto; }
+.ml-rotor { position: absolute; inset: 0; width: 100%; height: 100%; transform-origin: 50% 49.3333%; animation: ml-rotate 3s linear infinite; }
+@keyframes ml-rotate { to { transform: rotate(360deg); } }
+.programming-lesson .ml-rotation { margin: 5px 0 8px; text-align: center; color: var(--ml-signal); font-size: 1.15rem; font-weight: 750; }
+.programming-lesson .ml-rotation-note { margin: 0; color: #afc5d9; font-size: .8rem; text-align: center; }
+.ml-controls { min-width: 0; }
+.ml-power-heading { display: flex; justify-content: space-between; gap: 12px; align-items: center; font-weight: 650; }
+.ml-power-heading output { color: var(--cyan); font: 700 2rem/1.4 var(--mono); }
+.ml-controls input[type='range'] { width: 100%; min-height: 44px; margin: 8px 0 0; accent-color: var(--cyan); cursor: pointer; }
+.ml-scale { display: flex; justify-content: space-between; color: var(--muted); font: .8rem/1.5 var(--mono); }
+.ml-signs { display: flex; gap: 5px; margin: 12px 0 20px; }
+.ml-signs span { flex: 1; padding: 6px; border: 1px solid #354e66; border-radius: 6px; color: #adbed1; text-align: center; font-size: .8rem; }
+.ml-signs span[data-selected='true'] { border-color: var(--cyan); color: #c5f9ff; background: #183e50; font-weight: 750; }
+.ml-directions { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 0 0 12px; border: 1px solid #36536c; border-radius: 8px; padding: 8px 12px; }
+.ml-directions legend { padding-inline: 5px; color: #bddbe9; font-size: .86rem; }
+.ml-directions label { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: .86rem; cursor: pointer; }
+.ml-directions input { accent-color: var(--cyan); width: 17px; height: 17px; }
+.ml-stop { border-color: #bc8796; }
+.programming-lesson .ml-applied { margin: 20px 0 8px; font-size: .9rem; }
+.ml-command, .ml-code-line { padding: 14px; border: 1px solid #34516b; border-radius: 8px; background: #091522; color: #b1eff9; font: .8rem/1.7 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+.ml-command { margin: 0 0 12px; }
+.ml-code-line { margin: 10px 0 12px; }
+.ml-code-line mark { border-radius: 3px; background: #164b5e; color: #bdf8ff; padding: 2px 4px; }
+.motor-lesson .hw-table caption { text-align: left; padding-bottom: 10px; color: #d9eef9; }
+.motor-lesson .hw-table { min-width: 0; }
+.motor-lesson .hw-table td, .motor-lesson .hw-table th { overflow-wrap: anywhere; }
+.motor-lesson #ml-completion-help { margin-top: 14px; }
+.programming-lesson .ml-reduced-motion { display: none; }
+@media (max-width: 820px) { .ml-lab-grid { grid-template-columns: minmax(0, 1fr); gap: 18px; } }
+@media (prefers-reduced-motion: reduce) {
+  .ml-rotor { animation: none; }
+  .programming-lesson .ml-reduced-motion { display: block; color: #c5dfed; font-size: .8rem; }
+}

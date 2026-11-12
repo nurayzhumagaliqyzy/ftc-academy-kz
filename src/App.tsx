@@ -3,7 +3,8 @@ import type { KeyboardEvent } from 'react'
 import mark from './assets/mark.svg'
 import robot from './assets/robot.svg'
 import { HardwareModule, hardwareSectionFor } from './hardware/HardwareModule'
-import { ProgrammingLesson, isProgrammingLesson } from './programming/ProgrammingLesson'
+import { ProgrammingModule } from './programming/ProgrammingModule'
+import { programmingSectionFor } from './programming/routes'
 
 const iconPaths = {
   home: 'M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
@@ -51,7 +52,7 @@ const courses: Course[] = [
     label: 'Бағдарламалау',
     icon: 'code',
     description: 'FTC SDK (бағдарламалық әзірлеу жинағы) ортасымен танысып, Java тілінде TeleOp (оператор басқаратын режим) және Autonomous (автономды режим) бағдарламаларын жазуды үйрен.',
-    topics: ['FTC SDK және OpMode (роботты басқару бағдарламасы)', 'Gamepad (ойын контроллері) арқылы басқару', 'Autonomous режимінде қозғалысты басқару'],
+    topics: ['1-сабақ: FTC SDK және OpMode (роботты басқару бағдарламасы)', '2-сабақ: DC Motor (тұрақты ток қозғалтқышы) басқару'],
   },
   {
     id: 'simulator',
@@ -86,7 +87,7 @@ function CourseCard({ course, index }: { course: Course; index: number }) {
           <a className="primary-link hw-course-link" href="#hardware/explorer">FTC Hardware <Icon name="arrow" size={16} /></a>
         )}
         {course.id === 'programming' && (
-          <a className="primary-link hw-course-link" href="#programming/sdk-opmode">1-сабақты ашу <Icon name="arrow" size={16} /></a>
+          <a className="primary-link hw-course-link" href="#programming/lessons">Сабақтарды ашу <Icon name="arrow" size={16} /></a>
         )}
       </div>
     </article>
@@ -98,8 +99,8 @@ export function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuButton = useRef<HTMLButtonElement>(null)
   const hardwareSection = hardwareSectionFor(active)
-  const programmingLesson = isProgrammingLesson(active)
-  const inModule = Boolean(hardwareSection) || programmingLesson
+  const programmingSection = programmingSectionFor(active)
+  const inModule = Boolean(hardwareSection) || Boolean(programmingSection)
   const wasInModule = useRef(inModule)
 
   useEffect(() => {
@@ -158,7 +159,7 @@ export function App() {
           </a>
           <p className="nav-heading nav-course-heading">ОҚУ БАҒЫТТАРЫ</p>
           {courses.map((course) => (
-            <a key={course.id} href={course.id === 'programming' ? '#programming/sdk-opmode' : '#' + course.id} aria-current={active === course.id || (course.id === 'hardware' && hardwareSection) || (course.id === 'programming' && programmingLesson) ? 'location' : undefined} onClick={() => setMenuOpen(false)}>
+            <a key={course.id} href={course.id === 'programming' ? '#programming/lessons' : '#' + course.id} aria-current={active === course.id || (course.id === 'hardware' && hardwareSection) || (course.id === 'programming' && programmingSection) ? 'location' : undefined} onClick={() => setMenuOpen(false)}>
               <Icon name={course.icon} /> {course.id === 'simulator' ? 'Робот симуляторы' : course.label}
             </a>
           ))}
@@ -170,8 +171,8 @@ export function App() {
         <div className="content">
           {hardwareSection ? (
             <HardwareModule section={hardwareSection} />
-          ) : programmingLesson ? (
-            <ProgrammingLesson />
+          ) : programmingSection ? (
+            <ProgrammingModule section={programmingSection} />
           ) : (
             <>
               <header className="topline" id="home" tabIndex={-1}>

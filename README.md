@@ -1,6 +1,6 @@
 # FTC Academy KZ
 
-FTC робототехникасын қазақ тілінде үйренуге арналған оқу веб-құралы. React, TypeScript және Vite қолданылды. Басты бет, FTC Hardware модулі және FTC Programming бөлімінің алғашқы сабағы бар. Robot Simulator карточкасы алдағы модуль ретінде белгіленген.
+FTC робототехникасын қазақ тілінде үйренуге арналған оқу веб-құралы. React, TypeScript және Vite қолданылды. Басты бет, FTC Hardware модулі және FTC Programming бөлімінің екі сабағы бар. Robot Simulator карточкасы алдағы модуль ретінде белгіленген.
 
 ## Жергілікті іске қосу
 
@@ -26,7 +26,7 @@ npm run preview
 
 **FTC SDK және OpMode негіздері** — бастапқы деңгейге, шамамен 9-сыныпқа арналған сабақ.
 
-Басты беттегі **FTC Programming → 1-сабақты ашу** сілтемесін немесе бүйірлік мәзірдегі **Бағдарламалау** тармағын таңдаңыз. Тікелей мекенжай: `http://localhost:5173/#programming/sdk-opmode` (порт терминалда көрсетілген мәнге сәйкес болуы керек). Қолданыстағы hash-навигация пайдаланылды.
+Басты беттегі **FTC Programming → Сабақтарды ашу** сілтемесін немесе бүйірлік мәзірдегі **Бағдарламалау** тармағын таңдап, тізімнен 1-сабақты ашыңыз. Тікелей мекенжай: `http://localhost:5173/#programming/sdk-opmode` (порт терминалда көрсетілген мәнге сәйкес болуы керек). Қолданыстағы hash-навигация пайдаланылды.
 
 Сабақта оқу мақсаттары, төрт теория бөлімі, TeleOp/Autonomous салыстыруы, Java тіліндегі толық `HelloFTC` мысалы, бес ұғымды сәйкестендіру және бес сұрақтық тест бар. Java мысалы Gamepad-тағы A батырмасының күйін Telemetry арқылы көрсетеді; моторларды басқармайды. Бұл браузердегі тапсырмалар роботты басқармайды және нақты робот симуляциясы емес. Java мысалы FTC SDK жобасында орындалуға арналған, веб-бетте орындалмайды.
 
@@ -70,3 +70,57 @@ npm run build
 - [FTC Control System: OpMode, TeleOp және Autonomous](https://ftc-docs.firstinspires.org/en/latest/programming_resources/shared/control_system_intro/The-FTC-Control-System.html)
 - [Creating and Running an OpMode: LinearOpMode, waitForStart, Telemetry](https://ftc-docs.firstinspires.org/en/latest/programming_resources/tutorial_specific/android_studio/creating_op_modes/Creating-and-Running-an-Op-Mode-(Android-Studio).html)
 - [FIRST-Tech-Challenge/FtcRobotController — ресми FTC SDK](https://github.com/FIRST-Tech-Challenge/FtcRobotController)
+
+## FTC Programming · 2-сабақ
+
+**DC Motor (тұрақты ток қозғалтқышы) басқару** бірінші сабақтағы LinearOpMode негіздеріне сүйенеді. Сабақтар тізімі: `/#programming/lessons`; екінші сабақ: `/#programming/dc-motor`. Бірінші сабақтың `/#programming/sdk-opmode` мекенжайы сақталды. Екі сабақта да алдыңғы/келесі сабақ пен тізімге өту сілтемелері бар; аяқталған сабақты қайта ашуға болады.
+
+Сабақ құрамында:
+
+- Төрт теория бөлімі: мотордың жұмысы; Control Hub Motor 0 порты және конфигурация; қуат, бағыт және тоқтату; FTC SDK және жиі кездесетін қателер.
+- Motor Control Lab: −1…+1 аралығында 0.05 қадамды пернетақтамен басқарылатын slider, FORWARD/REVERSE radio таңдауы, іске қосу/тоқтату, таңба мен шартты айналу бағыты, жаңаратын Java пәрмендері.
+- Бес бос орынды толтыруға арналған Java тапсырмасы және толық MotorBasics.java мысалы. Мотор атауы `motor`; A басылып тұрғанда қуат 0.5, жіберілгенде 0; `finally` ішінде `setPower(0)` бар.
+- Бес сұрақтық тест: әр жауапқа дереу түсіндірме, қорытынды ұпай, қайта орындау; барлық сұраққа жауап беріп, кемінде 4/5 жинау керек.
+
+Аяқтау үшін төрт теория бөлімін белгілеңіз, Lab-та моторды нөлден өзге қуатпен іске қосып тоқтатыңыз, Java тапсырмасының бесеуін дұрыс орындаңыз және тесттен өтіңіз. Содан кейін «Сабақты аяқтадым» батырмасын басыңыз. Тестті қайталау тек осы сабақтың жауаптары мен аяқталу белгісін тазартады.
+
+Екінші сабақтың кілті — `ftc-academy-kz:programming:dc-motor:v1`. Бірінші сабақтың `ftc-academy-kz:programming:sdk-opmode:v1` кілті мен деректер пішімі өзгермеді. Hardware прогресіне жазылмайды. Lab-тың қозғалыс күйі сақталмайды: бетті қайта ашқанда мотор тоқтап тұрады. Қуат шектен шықса қысқартылады, жарамсыз/шексіз сан нөлге айналады. Сақтау бұғатталса немесе квота толса, жаттығулар сол сессияда жұмыс істеп, ескерту көрсетеді.
+
+### Көрнекіліктің шектеулері
+
+Lab — мотор физикасының симуляторы емес. Анимацияның қарқыны тұрақты, қуаттан RPM есептелмейді. Қуат таңбасы мен бағыт байланысы RUN_WITHOUT_ENCODER үшін көрсетіледі. FORWARD + оң қуаттың сұлбада сағат тілімен берілуі — шартты таңдау; нақты бағыт қарау жағына, моторға және қосылымға байланысты. Нақты жылдамдыққа мотор түрі, жүктеме, батарея кернеуі және басқа жағдайлар әсер етеді.
+
+Stop көрнекілікті бірден тоқтатады; нақты механизм инерциямен қозғала алады. BRAKE нөлдік қуатта айналуға кедергі келтіреді, позицияны дәл ұстайтын реттегіш емес. Бет Java кодын құрастырмайды, роботпен байланыспайды. Java мысалы нақты FTC SDK/роботта компиляцияланып орындалған жоқ. `prefers-reduced-motion` қосылса, айналу анимациясының орнына бағыт мәтіні қалады.
+
+### Екінші сабақтың тексеруі · 11.11.2026
+
+- `npm test`: 14/14 өтті (алдыңғы 5 тест және жаңа 9 тест). Жаңа тесттер маршруттарды, қуат шекараларын, төрт бағыт/таңба комбинациясын, нөлдік қуатты, тесттің 4/5 шегін, аяқтау шарттарын, жарамсыз деректерді, сақтау қателерін, екі сабақ пен Hardware деректерінің оқшаулануын тексереді.
+- `npm run typecheck`: өтті.
+- `npm run build`: өтті (Vite 8.3.8); жаңа dependency қосылған жоқ.
+- Басқарылатын preview арқылы Chromium-да басты бет → сабақтар тізімі → 1-сабақ → келесі сабақ, Motor Lab, Java тапсырмасындағы қате/дұрыс жауап, тесттен 4/5 алу, аяқтау, refresh, қайта ашу және retry тексерілді. Бірінші сабақтағы 1/4 оқу белгісі мен 1/5 тест нәтижесі өзгермей сақталды. Hardware Explorer-ге кіру де тексерілді; Hardware файлдары өзгермеді.
+- Slider Home/End пернелері, REVERSE таңдауы, қуат таңбасына сай бағыт, Stop-тан кейінгі 0.00 пәрмені және нөлде Start бұғатталуы тексерілді. Қозғалыс күйі refresh-тен кейін қалпына келтірілмейді.
+- 454 және 340 CSS px тар көріністер браузер zoom арқылы тексерілді: бетте көлденең overflow жоқ; мобильді мәзір мен Escape жұмыс істейді. Бұл нақты телефондағы сенсорлық тест немесе device emulation емес. Ұзын Java жауаптарының тар экрандағы overflow мәселесі түзетілді. Қайталанған HTML id жоқ.
+- Қолданба URL-інен келген console error байқалмады; ортадағы browser extension хабарламалары қолданбаның қатесі ретінде есептелмеді. Reduced-motion стилі қосылған, бірақ OS параметрі арқылы жеке тексерілген жоқ.
+
+### Preview
+
+PR тармағын ашып, Node.js 22.12+ ортасында орындаңыз:
+
+```sh
+git fetch origin
+git switch feat/programming-dc-motor
+npm install
+npm run dev
+```
+
+Терминалда көрсетілген Local URL-ге `/#programming/dc-motor` жалғаңыз. PR үшін Vercel Preview жасалса, сол deployment мекенжайын қолданыңыз. Бұл PR автоматты түрде main-ге біріктірілмейді; production сайт main-ге біріктірілгенше бірінші сабақтағы нұсқада қалады.
+
+### Екінші сабақтың қосымша ресми дереккөздері
+
+- [Connecting a Motor to the Hub](https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/connecting_devices/connecting_motor/connecting-motor.html)
+- [Control Hub Motor және Encoder порттары](https://ftc-docs.firstinspires.org/en/latest/control_hard_compon/rc_components/hub/ports/ch-ports.html)
+- [Мотор конфигурациясы](https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/configuring_dc_motor/configuring-dc-motor.html)
+- [OnBot Java: OpMode және hardwareMap](https://ftc-docs.firstinspires.org/en/latest/programming_resources/tutorial_specific/onbot_java/creating_op_modes/Creating-and-Running-an-Op-Mode-(OnBot-Java).html)
+- [Motor Modes және Encoders](https://ftc-docs.firstinspires.org/en/latest/tech_tips/tech-tips/tech-tip-motor-modes/tech-tip-motor-modes.html)
+- [DcMotorSimple API: setPower, setDirection](https://javadoc.io/static/org.firstinspires.ftc/RobotCore/10.2.0/com/qualcomm/robotcore/hardware/DcMotorSimple.html)
+- [ZeroPowerBehavior API: BRAKE және FLOAT](https://javadoc.io/static/org.firstinspires.ftc/RobotCore/10.3.0/com/qualcomm/robotcore/hardware/DcMotor.ZeroPowerBehavior.html)
