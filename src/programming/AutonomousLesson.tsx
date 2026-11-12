@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { LessonCodeExercise, LessonNavigation, LessonQuiz, ReadingSection } from './LessonComponents'
+import { LessonScenario, PreviousCompletionNotice, LessonCodeExercise, LessonNavigation, LessonQuiz, ReadingSection } from './LessonComponents'
 import { AutonomousLab } from './AutonomousLab'
 import {
   autonomousCodeScore, autonomousCodeTasks, autonomousJavaExample, autonomousJavaLines, autonomousProgressPercent,
-  autonomousQuestions, autonomousQuizPassed, autonomousQuizScore, autonomousReadings, canCompleteAutonomous,
+  autonomousScenario, autonomousQuestions, autonomousQuizPassed, autonomousQuizScore, autonomousReadings, canCompleteAutonomous,
   loadAutonomousProgress, normalizeAutonomousProgress, saveAutonomousProgress,
 } from './autonomousModel'
 import type { AutonomousProgress, AutonomousReadingId } from './autonomousModel'
@@ -41,15 +41,17 @@ export function AutonomousLesson() {
     <section className="hw-panel pl-progress" aria-labelledby="al-progress">
       <div className="hw-section-head"><h2 id="al-progress">Сабақтағы прогресс</h2><span className="hw-count">{percent}% · {progress.completed ? 'Аяқталды' : 'Оқу барысында'}</span></div>
       <progress className="hw-meter" max={100} value={percent} aria-label="Төртінші сабақтағы прогресс">{percent}%</progress>
-      <p>Теория: {progress.read.length}/4 · Path Lab: {progress.solved.length}/3 · Java: {autonomousCodeScore(progress)}/6 · Тест: {autonomousQuizScore(progress)}/5</p>
-      <p className="hw-muted" role="status">{storageAvailable ? 'Осы сабақтың прогресі браузерде бөлек сақталады. Алдыңғы үш сабақтың нәтижелері сақталады.' : 'Браузерде сақтау қолжетімсіз. Бетті жапқанда осы сабақтағы жаңа прогресс жоғалады.'}</p>
+      <p>Теория: {progress.read.length}/4 · Path Lab: {progress.solved.length}/3 · Java: {autonomousCodeScore(progress)}/6 · Тест: {autonomousQuizScore(progress)}/5 · Жағдаят: {progress.scenarioAnswer === autonomousScenario.answer ? 'орындалды' : 'әлі орындалмады'}</p>
+      <PreviousCompletionNotice show={progress.previouslyCompleted && !progress.completed} />
+        <p className="hw-muted" role="status">{storageAvailable ? 'Осы сабақтың прогресі браузерде бөлек сақталады. Алдыңғы үш сабақтың нәтижелері сақталады.' : 'Браузерде сақтау қолжетімсіз. Бетті жапқанда осы сабақтағы жаңа прогресс жоғалады.'}</p>
     </section>
     <nav className="pl-jumps" aria-label="Төртінші сабақ бөлімдері">
-      {[['mode', 'Теория'], ['lab', 'Path Lab'], ['code-exercise', 'Java тапсырмасы'], ['example', 'Толық Java мысалы'], ['quiz', 'Тест'], ['completion', 'Аяқтау']].map(([id, label]) => <button type="button" className="hw-button hw-button-secondary" key={id} onClick={() => jumpTo(id)}>{label}</button>)}
+      {[['mode', 'Теория'], ['lab', 'Path Lab'], ['code-exercise', 'Java тапсырмасы'], ['example', 'Толық Java мысалы'], ['quiz', 'Тест'], ['scenario', 'Жағдаят'], ['completion', 'Аяқтау']].map(([id, label]) => <button type="button" className="hw-button hw-button-secondary" key={id} onClick={() => jumpTo(id)}>{label}</button>)}
     </nav>
     <section className="hw-panel" aria-labelledby="al-objectives">
       <p className="hw-kicker">БҮГІН НЕ ҮЙРЕНЕСІҢ?</p><h2 id="al-objectives">Оқу мақсаттары</h2>
       <ul className="hw-list"><li>Autonomous пен TeleOp (оператор басқаратын режим) айырмасын түсінесің.</li><li>Бастапқы орын, бағыт және нысана бойынша алгоритм құрастырасың.</li><li>Нұсқаулардың ретін тексеріп, қатесін түзетесің.</li><li>Бір DC Motor (тұрақты ток қозғалтқышы) үшін уақытпен басқару кодын оқып, оның шектеуін түсінесің.</li></ul>
+      <p className="pl-outcome"><b>Күтілетін нәтиже:</b> Нысанаға жеткізетін торлы алгоритм құрып, қате бұрылуды түзетесің және уақытпен қозғалыстың шектеуін түсіндіресің.</p>
       <p className="pl-prerequisite">Дайындық: <a className="hw-back" href="#programming/gamepad-teleop">3-сабақтағы TeleOp пен басқару циклін қайтала →</a></p>
     </section>
     <ReadingSection {...readingProps('mode')}>
@@ -85,12 +87,17 @@ export function AutonomousLesson() {
     <LessonQuiz id="al-quiz" questions={autonomousQuestions} answers={progress.answers}
       onAnswer={(id, answer) => update(previous => previous.answers[id] !== undefined ? previous : { ...previous, answers: { ...previous.answers, [id]: answer } })}
       onRetry={() => update(previous => ({ ...previous, answers: {}, completed: false }))}
-      retryNote="Тестті қайта бастау тек осы сабақтың тест жауаптары мен аяқталу белгісін жаңартады. Теория, орындалған үш тапсырма және Java жауаптары сақталады." />
+      retryNote="Тестті қайта бастау тек осы сабақтың тест жауаптары мен аяқталу белгісін жаңартады. Теория, орындалған үш тапсырма, Java жауаптары және жағдаят сақталады." />
+    <LessonScenario id="al-scenario" question={autonomousScenario} answer={progress.scenarioAnswer}
+      onAnswer={answer => update(previous => previous.scenarioAnswer !== undefined ? previous : { ...previous, scenarioAnswer: answer })}
+      onRetry={() => update(previous => ({ ...previous, scenarioAnswer: undefined, completed: false }))} />
+
     <section className="hw-panel" aria-labelledby="al-completion">
       <h2 id="al-completion" tabIndex={-1}>Сабақты аяқтау</h2>
-      <ul className="pl-checklist"><li>{progress.read.length === 4 ? '✓' : '○'} Теорияны оқу ({progress.read.length}/4)</li><li>{progress.solved.length === 3 ? '✓' : '○'} Path Lab тапсырмалары ({progress.solved.length}/3)</li><li>{autonomousCodeScore(progress) === 6 ? '✓' : '○'} Java тапсырмасы ({autonomousCodeScore(progress)}/6)</li><li>{autonomousQuizPassed(progress) ? '✓' : '○'} Тест: барлық бес сұраққа жауап және кемінде 4/5 ({answered}/5 жауап, {autonomousQuizScore(progress)}/5 дұрыс)</li></ul>
+      <ul className="pl-checklist"><li>{progress.read.length === 4 ? '✓' : '○'} Теорияны оқу ({progress.read.length}/4)</li><li>{progress.solved.length === 3 ? '✓' : '○'} Path Lab тапсырмалары ({progress.solved.length}/3)</li><li>{autonomousCodeScore(progress) === 6 ? '✓' : '○'} Java тапсырмасы ({autonomousCodeScore(progress)}/6)</li><li>{autonomousQuizPassed(progress) ? '✓' : '○'} Тест: барлық бес сұраққа жауап және кемінде 4/5 ({answered}/5 жауап, {autonomousQuizScore(progress)}/5 дұрыс)</li>  <li>{progress.scenarioAnswer === autonomousScenario.answer ? '✓' : '○'} Қолданбалы жағдаятты дұрыс орындау</li>
+        </ul>
       <button type="button" className="hw-button" disabled={!ready || progress.completed} onClick={() => update(previous => ({ ...previous, completed: true }))}>{progress.completed ? '✓ Сабақ аяқталды' : 'Сабақты аяқтадым'}</button>
-      <p role="status">{progress.completed ? 'Жарайсың! Алгоритмді жоспарлап, қадамдап тексеруді үйрендің. Сабаққа қайта оралып, тапсырмаларды қайталай аласың.' : 'Аяқтау батырмасы жоғарыдағы төрт шарт орындалғанда ашылады.'}</p>
+      <p role="status">{progress.completed ? 'Жарайсың! Алгоритмді жоспарлап, қадамдап тексеруді үйрендің. Сабаққа қайта оралып, тапсырмаларды қайталай аласың.' : 'Аяқтау батырмасы жоғарыдағы бес шарт орындалғанда ашылады.'}</p>
     </section>
     <LessonNavigation current="autonomous" pager />
     <section className="hw-panel" aria-labelledby="al-sources"><h2 id="al-sources">Ресми дереккөздер</h2><p>FIRST Tech Challenge құжаттамасы · тексерілген күні: 12.11.2026. Сілтемелер English тілінде, жаңа бетте ашылады.</p><ul className="hw-list">

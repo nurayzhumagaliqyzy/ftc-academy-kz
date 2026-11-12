@@ -1,4 +1,5 @@
-export const motorStorageKey = 'ftc-academy-kz:programming:dc-motor:v1'
+export const motorStorageKey = 'ftc-academy-kz:programming:dc-motor:v2'
+export const legacyMotorStorageKey = 'ftc-academy-kz:programming:dc-motor:v1'
 export const motorReadings = [
   { id: 'motor', title: 'DC Motor қалай жұмыс істейді?' },
   { id: 'connection', title: 'Control Hub-қа қосу' },
@@ -22,6 +23,33 @@ export function motorOutput(power: number, direction: MotorDirection, running: b
     rotation: effectivePower === 0 ? 'stopped' : effectivePower > 0 ? 'clockwise' : 'counterclockwise',
     command: `motor.setDirection(DcMotorSimple.Direction.${direction});\nmotor.setPower(${appliedPower.toFixed(2)});`,
   } as const
+}
+
+export const motorChecks = [
+  { id: 'forward-positive', title: '1. Оң қуат', instruction: 'FORWARD таңда, оң қуат орнат та, «Іске қосу» батырмасын бас. Негізгі бағытпен салыстырғанда мотор қалай айналады?', explanation: 'FORWARD және оң қуат негізгі логикалық бағытты береді. Сұлбада ол шартты түрде ⟳ деп көрсетілген.' },
+  { id: 'reverse-negative', title: '2. Екі кері әсер', instruction: 'Тоқтат. REVERSE таңда, теріс қуат орнат та, қайта іске қос. FORWARD + оң қуатпен салыстырғанда бағыт қандай?', explanation: 'Теріс қуат бағыт әсерін кері аударады, REVERSE оны тағы кері аударады. Екі кері әсерден кейін FORWARD + оң қуаттағы негізгі бағыт шығады.' },
+  { id: 'zero', title: '3. Нөлдік қуат', instruction: '«Тоқтату · setPower(0)» батырмасын бас. Енді жетек қуаты мен оқу анимациясы қандай күйде?', explanation: 'setPower(0) жетек қуатын нөлдейді. FORWARD не REVERSE баптауы нөлдік қуатты қозғалысқа айналдырмайды. Нақты механизм инерциямен қозғала алады.' },
+] as const
+export type MotorCheckId = (typeof motorChecks)[number]['id']
+export const motorPredictions = [
+  { id: 'primary', label: 'Негізгі бағытпен бірдей' },
+  { id: 'opposite', label: 'Негізгі бағытқа кері' },
+  { id: 'zero', label: 'Жетек қуаты нөл, анимация тоқтаған' },
+] as const
+export function motorLabPassed(progress: Pick<MotorProgress, 'labChecks'>) {
+  return motorChecks.every(check => progress.labChecks.includes(check.id))
+}
+export function checkMotorUnderstanding(id: MotorCheckId, power: number, direction: MotorDirection, running: boolean, prediction: string) {
+  if (!Number.isFinite(power)) return { correct: false, explanation: 'Қуат жарамды сан болуы керек. Жүгірткі арқылы −1…+1 аралығын таңда.' }
+  const task = motorChecks.find(check => check.id === id)
+  if (!task) return { correct: false, explanation: 'Алдымен бағалау тапсырмасын таңда.' }
+  const normalized = normalizePower(power)
+  const configured = id === 'forward-positive' ? running && direction === 'FORWARD' && normalized > 0 :
+    id === 'reverse-negative' ? running && direction === 'REVERSE' && normalized < 0 : normalized === 0
+  if (!configured) return { correct: false, explanation: id === 'forward-positive' ? 'Алдымен FORWARD және оң қуатпен анимацияны іске қос. Содан кейін бағытты таңда.' : id === 'reverse-negative' ? 'Алдымен REVERSE және теріс қуатпен анимацияны іске қос. Таңба мен баптауды бірге тексер.' : 'Алдымен «Тоқтату» батырмасын басып, таңдалған қуатты 0.00 мәніне келтір.' }
+  const expected = id === 'zero' ? 'zero' : 'primary'
+  const explanation = task.explanation
+  return { correct: prediction === expected, explanation }
 }
 
 export const codeTasks = [
@@ -77,10 +105,21 @@ public class MotorBasics extends LinearOpMode {
     }
 }`
 
+export const motorScenario = {
+  prompt: 'Жағдаят: FORWARD және +0.5 қуатта мотор негізгі бағытта айналды. Қуат +0.5 болып қалды, бірақ баптау REVERSE болып өзгеріп, бағыт кері айналды. Негізгі бағытқа қалай қайтарасың?',
+  options: ['REVERSE жылдамдықты ғана өзгертеді; қуатты +1.0 қою керек', 'Алдымен setPower(0), содан кейін FORWARD баптауын қайтарып, +0.5 қуатты қайта беру', 'setPower(-1) арқылы моторды тоқтату'],
+  answer: 1,
+  explanation: 'REVERSE сол қуаттың бағыт әсерін FORWARD-пен салыстырғанда кері аударады. Қуатты нөлдеп, FORWARD орнатқаннан кейін +0.5 негізгі логикалық бағытты қайтарады. Теріс қуат тоқтату емес. Нақты сағат тілі бағыты моторға және қарау жағына байланысты.',
+} as const
+
 export type MotorProgress = {
+  assessmentVersion: 2
+  previouslyCompleted: boolean
+  scenarioAnswer?: number
   read: MotorReadingId[]
   code: Record<string, string>
   answers: Record<string, number>
+  labChecks: MotorCheckId[]
   labDone: boolean
   completed: boolean
 }
@@ -97,17 +136,20 @@ export function motorQuizPassed(progress: MotorProgress) {
 export function motorCodeScore(progress: MotorProgress) {
   return codeTasks.filter(task => progress.code[task.id] === task.answer).length
 }
-export function canCompleteMotor(progress: MotorProgress) {
+function legacyCompletionRequirements(progress: MotorProgress) {
   return motorReadings.every(section => progress.read.includes(section.id)) && progress.labDone &&
     motorCodeScore(progress) === codeTasks.length && motorQuizPassed(progress)
 }
+export function canCompleteMotor(progress: MotorProgress) {
+  return legacyCompletionRequirements(progress) && progress.scenarioAnswer === motorScenario.answer && motorLabPassed(progress)
+}
 export function motorProgressPercent(progress: MotorProgress) {
-  const steps = progress.read.length + Number(progress.labDone) + Number(motorCodeScore(progress) === codeTasks.length) +
-    Number(motorQuizPassed(progress)) + Number(progress.completed && canCompleteMotor(progress))
-  return Math.round(steps / 8 * 100)
+  const steps = progress.read.length + Number(motorLabPassed(progress)) + Number(motorCodeScore(progress) === codeTasks.length) +
+    Number(motorQuizPassed(progress)) + Number(progress.scenarioAnswer === motorScenario.answer) + Number(progress.completed && canCompleteMotor(progress))
+  return Math.round(steps / 9 * 100)
 }
 export function normalizeMotorProgress(value: unknown): MotorProgress {
-  const progress: MotorProgress = { read: [], code: {}, answers: {}, labDone: false, completed: false }
+  const progress: MotorProgress = { assessmentVersion: 2, previouslyCompleted: false, read: [], code: {}, answers: {}, labChecks: [], labDone: false, completed: false }
   if (!isRecord(value)) return progress
   if (Array.isArray(value.read)) {
     const read = value.read
@@ -127,15 +169,29 @@ export function normalizeMotorProgress(value: unknown): MotorProgress {
       }
     }
   }
-  progress.labDone = value.labDone === true
+  if (Array.isArray(value.labChecks)) {
+    const checks = value.labChecks
+    progress.labChecks = motorChecks.filter(check => checks.includes(check.id)).map(check => check.id)
+  }
+  progress.labDone = value.labDone === true || motorLabPassed(progress)
+  const scenarioAnswer = value.scenarioAnswer
+  if (typeof scenarioAnswer === 'number' && Number.isInteger(scenarioAnswer) && scenarioAnswer >= 0 && scenarioAnswer < motorScenario.options.length) progress.scenarioAnswer = scenarioAnswer
+  progress.previouslyCompleted = value.previouslyCompleted === true ||
+    ((value.assessmentVersion === undefined || value.assessmentVersion === 1) && value.completed === true && legacyCompletionRequirements(progress))
   progress.completed = value.completed === true && canCompleteMotor(progress)
   return progress
 }
+// v1 remains an untouched backup; v2 is the current assessment record.
 export function loadMotorProgress(): MotorProgress {
-  try { return normalizeMotorProgress(JSON.parse(localStorage.getItem(motorStorageKey) ?? 'null')) }
-  catch { return normalizeMotorProgress(null) }
+  try {
+    const current = localStorage.getItem(motorStorageKey)
+    if (current !== null) {
+      try { const parsed: unknown = JSON.parse(current); if (isRecord(parsed)) return normalizeMotorProgress(parsed) } catch { /* recover from the v1 backup below */ }
+    }
+    return normalizeMotorProgress(JSON.parse(localStorage.getItem(legacyMotorStorageKey) ?? 'null'))
+  } catch { return normalizeMotorProgress(null) }
 }
-export function saveMotorProgress(progress: MotorProgress) {
-  try { localStorage.setItem(motorStorageKey, JSON.stringify(progress)); return true }
+export function saveMotorProgress(progress: MotorProgress): boolean {
+  try { localStorage.setItem(motorStorageKey, JSON.stringify(normalizeMotorProgress(progress))); return true }
   catch { return false }
 }

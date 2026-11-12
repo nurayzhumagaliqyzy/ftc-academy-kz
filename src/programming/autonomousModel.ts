@@ -1,4 +1,5 @@
-export const autonomousStorageKey = 'ftc-academy-kz:programming:autonomous:v1'
+export const autonomousStorageKey = 'ftc-academy-kz:programming:autonomous:v2'
+export const legacyAutonomousStorageKey = 'ftc-academy-kz:programming:autonomous:v1'
 export const gridSize = 6
 export const maxCommands = 32
 export const commandOptions = [
@@ -114,21 +115,34 @@ export const autonomousJavaLines = [
 ] as const
 export const autonomousJavaExample = autonomousJavaLines.map(([line]) => line).join('\n')
 
+export const autonomousScenario = {
+  prompt: 'Жағдаят: торда робот (1, 1) орнында солтүстікке қарап тұр; нысана (2, 2). «Алға → Солға 90° → Алға → Stop» тізбегі нысанаға жеткізбеді. Қай түзету дұрыс?',
+  options: ['Солға 90° орнына Оңға 90° қою: Алға → Оңға 90° → Алға → Stop', 'Соңына тағы бір Алға қосу', 'Stop-ты бірінші орынға қою'],
+  answer: 0,
+  explanation: 'Алғашқы Алға (1, 2) ұяшығына жеткізеді. Солға бұрылсаң батысқа қарап, келесі Алға (0, 2) береді. Оңға бұрылсаң шығысқа қарап, (2, 2) нысанасына жетесің. Бұрылу орынды өзгертпейді; Stop нысанада тізбекті аяқтайды. Бұл — торлы оқу моделінің ережесі.',
+} as const
+
 export type AutonomousProgress = {
+  assessmentVersion: 2
+  previouslyCompleted: boolean
+  scenarioAnswer?: number
   read: AutonomousReadingId[]; solved: string[]; code: Record<string, string>; answers: Record<string, number>; completed: boolean
 }
 function isRecord(value: unknown): value is Record<string, unknown> { return value !== null && typeof value === 'object' && !Array.isArray(value) }
 export function autonomousCodeScore(progress: AutonomousProgress) { return autonomousCodeTasks.filter(task => progress.code[task.id] === task.answer).length }
 export function autonomousQuizScore(progress: AutonomousProgress) { return autonomousQuestions.filter(question => progress.answers[question.id] === question.answer).length }
 export function autonomousQuizPassed(progress: AutonomousProgress) { return autonomousQuestions.every(question => progress.answers[question.id] !== undefined) && autonomousQuizScore(progress) >= 4 }
-export function canCompleteAutonomous(progress: AutonomousProgress) {
+function legacyCompletionRequirements(progress: AutonomousProgress) {
   return autonomousReadings.every(section => progress.read.includes(section.id)) && challenges.every(challenge => progress.solved.includes(challenge.id)) && autonomousCodeScore(progress) === autonomousCodeTasks.length && autonomousQuizPassed(progress)
 }
+export function canCompleteAutonomous(progress: AutonomousProgress) {
+  return legacyCompletionRequirements(progress) && progress.scenarioAnswer === autonomousScenario.answer
+}
 export function autonomousProgressPercent(progress: AutonomousProgress) {
-  return Math.round((progress.read.length + progress.solved.length + Number(autonomousCodeScore(progress) === autonomousCodeTasks.length) + Number(autonomousQuizPassed(progress)) + Number(progress.completed && canCompleteAutonomous(progress))) / 10 * 100)
+  return Math.round((progress.read.length + progress.solved.length + Number(autonomousCodeScore(progress) === autonomousCodeTasks.length) + Number(autonomousQuizPassed(progress)) + Number(progress.scenarioAnswer === autonomousScenario.answer) + Number(progress.completed && canCompleteAutonomous(progress))) / 11 * 100)
 }
 export function normalizeAutonomousProgress(value: unknown): AutonomousProgress {
-  const progress: AutonomousProgress = { read: [], solved: [], code: {}, answers: {}, completed: false }
+  const progress: AutonomousProgress = { assessmentVersion: 2, previouslyCompleted: false, read: [], solved: [], code: {}, answers: {}, completed: false }
   if (!isRecord(value)) return progress
   if (Array.isArray(value.read)) { const read = value.read; progress.read = autonomousReadings.filter(section => read.includes(section.id)).map(section => section.id) }
   if (Array.isArray(value.solved)) { const solved = value.solved; progress.solved = challenges.filter(challenge => solved.includes(challenge.id)).map(challenge => challenge.id) }
@@ -140,12 +154,24 @@ export function normalizeAutonomousProgress(value: unknown): AutonomousProgress 
     const answer = value.answers[question.id]
     if (typeof answer === 'number' && Number.isInteger(answer) && answer >= 0 && answer < question.options.length) progress.answers[question.id] = answer
   }
+  const scenarioAnswer = value.scenarioAnswer
+  if (typeof scenarioAnswer === 'number' && Number.isInteger(scenarioAnswer) && scenarioAnswer >= 0 && scenarioAnswer < autonomousScenario.options.length) progress.scenarioAnswer = scenarioAnswer
+  progress.previouslyCompleted = value.previouslyCompleted === true ||
+    ((value.assessmentVersion === undefined || value.assessmentVersion === 1) && value.completed === true && legacyCompletionRequirements(progress))
   progress.completed = value.completed === true && canCompleteAutonomous(progress)
   return progress
 }
+// v1 remains an untouched backup; v2 is the current assessment record.
 export function loadAutonomousProgress(): AutonomousProgress {
-  try { return normalizeAutonomousProgress(JSON.parse(localStorage.getItem(autonomousStorageKey) ?? 'null')) } catch { return normalizeAutonomousProgress(null) }
+  try {
+    const current = localStorage.getItem(autonomousStorageKey)
+    if (current !== null) {
+      try { const parsed: unknown = JSON.parse(current); if (isRecord(parsed)) return normalizeAutonomousProgress(parsed) } catch { /* recover from the v1 backup below */ }
+    }
+    return normalizeAutonomousProgress(JSON.parse(localStorage.getItem(legacyAutonomousStorageKey) ?? 'null'))
+  } catch { return normalizeAutonomousProgress(null) }
 }
-export function saveAutonomousProgress(progress: AutonomousProgress) {
-  try { localStorage.setItem(autonomousStorageKey, JSON.stringify(progress)); return true } catch { return false }
+export function saveAutonomousProgress(progress: AutonomousProgress): boolean {
+  try { localStorage.setItem(autonomousStorageKey, JSON.stringify(normalizeAutonomousProgress(progress))); return true }
+  catch { return false }
 }

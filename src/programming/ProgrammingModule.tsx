@@ -37,6 +37,7 @@ function ProgrammingOverview() {
         <h2>{index + 1}-сабақ: {lesson.title}</h2>
         <p>{index === 0 ? 'FTC SDK (бағдарламалық әзірлеу жинағы), OpMode (роботты басқару бағдарламасы) және алғашқы Java мысалы.' : index === 1 ? 'Қосылым, қуат пен бағыт. Мотордың оқу анимациясы, Java тапсырмасы және тест.' : index === 2 ? 'Gamepad, TeleOp (оператор басқаратын режим) және Joystick (басқару тетігі). Кіріс мәнінен мотор қуатына дейінгі оқу моделі.' : 'Алдын ала жоспарланған алгоритм, үш торлы тапсырма және бір моторлы уақытпен басқару мысалы.'}</p>
         <p className="hw-count">{progress[index].completed ? '✓ Аяқталды' : percentages[index] > 0 ? 'Оқу барысында' : 'Әлі басталмады'} · {percentages[index]}%</p>
+        {progress[index].previouslyCompleted && !progress[index].completed && <p className="hw-muted">Бұрынғы аяқтау белгісі сақталған · жаңартылған бағалау күтіледі</p>}
         <a className="primary-link" href={'#' + lesson.hash}>{progress[index].completed ? 'Сабақты қайта қарау' : 'Сабақты ашу'} →</a>
       </article>)}
     </div>

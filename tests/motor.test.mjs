@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { afterEach, test } from 'node:test'
 import {
-  canCompleteMotor, codeTasks, loadMotorProgress, motorCodeScore, motorOutput, motorProgressPercent,
+  motorScenario, motorChecks, canCompleteMotor, codeTasks, loadMotorProgress, motorCodeScore, motorOutput, motorProgressPercent,
   motorQuestions, motorQuizPassed, motorQuizScore, motorReadings, motorStorageKey,
   normalizeMotorProgress, normalizePower, saveMotorProgress,
 } from '../src/programming/motorModel.ts'
@@ -14,8 +14,8 @@ afterEach(() => {
   else delete globalThis.localStorage
 })
 function readyProgress() {
-  return normalizeMotorProgress({
-    read: motorReadings.map(section => section.id), labDone: true,
+  return normalizeMotorProgress({ assessmentVersion: 2, scenarioAnswer: motorScenario.answer,
+    read: motorReadings.map(section => section.id), labDone: true, labChecks: motorChecks.map(check => check.id),
     code: Object.fromEntries(codeTasks.map(task => [task.id, task.answer])),
     answers: Object.fromEntries(motorQuestions.map(question => [question.id, question.answer])),
   })
@@ -71,9 +71,9 @@ test('reading, lab, code and quiz are necessary; explicit completion reaches 100
   const progress = readyProgress()
   assert.equal(motorCodeScore(progress), 5)
   assert.equal(canCompleteMotor(progress), true)
-  assert.equal(motorProgressPercent(progress), 88)
+  assert.equal(motorProgressPercent(progress), 89)
   assert.equal(motorProgressPercent({ ...progress, completed: true }), 100)
-  for (const change of [{ read: [] }, { labDone: false }, { code: {} }, { answers: {} }]) {
+  for (const change of [{ read: [] }, { labChecks: [] }, { code: {} }, { answers: {} }]) {
     const incomplete = normalizeMotorProgress({ ...progress, ...change, completed: true })
     assert.equal(canCompleteMotor(incomplete), false)
     assert.equal(incomplete.completed, false)
@@ -85,7 +85,7 @@ test('invalid saved values, duplicate reading ids and forged completion are norm
   assert.deepEqual(normalizeMotorProgress({
     read: ['motor', 'motor', 'unknown'], code: { declare: 'DcMotor', map: 'bad', unknown: '0' },
     answers: { purpose: 5, class: -1, range: 0.5, direction: '2', stop: 1 }, labDone: 'true', completed: true,
-  }), { read: ['motor'], code: { declare: 'DcMotor' }, answers: { stop: 1 }, labDone: false, completed: false })
+  }), { assessmentVersion: 2, previouslyCompleted: false, labChecks: [], read: ['motor'], code: { declare: 'DcMotor' }, answers: { stop: 1 }, labDone: false, completed: false })
 })
 
 test('second-lesson round trip does not modify first-lesson or Hardware storage', () => {

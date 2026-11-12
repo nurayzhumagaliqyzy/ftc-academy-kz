@@ -1,4 +1,5 @@
-export const gamepadStorageKey = 'ftc-academy-kz:programming:gamepad-teleop:v1'
+export const gamepadStorageKey = 'ftc-academy-kz:programming:gamepad-teleop:v2'
+export const legacyGamepadStorageKey = 'ftc-academy-kz:programming:gamepad-teleop:v1'
 export const gamepadReadings = [
   { id: 'controller', title: 'Gamepad және Driver Station' },
   { id: 'modes', title: 'TeleOp пен Autonomous айырмасы' },
@@ -74,7 +75,17 @@ public class GamepadMotor extends LinearOpMode {
     }
 }`
 
+export const gamepadScenario = {
+  prompt: 'Жағдаят: сол Joystick (басқару тетігі) артқа тартылып, gamepad1.left_stick_y = +0.6 болды. double power = -gamepad1.left_stick_y; орындалды. FORWARD баптауында қандай пәрмен беріледі?',
+  options: ['motor.setPower(0.6); — негізгі бағыт', 'motor.setPower(0); — тетік артқа тартылса мотор тоқтайды', 'motor.setPower(-0.6); — негізгі бағытқа кері'],
+  answer: 2,
+  explanation: 'power = −(+0.6) = −0.6. FORWARD баптауында теріс қуат негізгі логикалық бағытқа кері әсер етеді. Бұл RPM емес; нөлдік қуат тетік ортасында Y = 0 болғанда шығады. Нақты айналу бағыты мотордың орнатылуына да байланысты.',
+} as const
+
 export type GamepadProgress = {
+  assessmentVersion: 2
+  previouslyCompleted: boolean
+  scenarioAnswer?: number
   read: GamepadReadingId[]
   code: Record<string, string>
   answers: Record<string, number>
@@ -94,17 +105,20 @@ export function gamepadQuizPassed(progress: GamepadProgress) {
 export function gamepadCodeScore(progress: GamepadProgress) {
   return gamepadCodeTasks.filter(task => progress.code[task.id] === task.answer).length
 }
-export function canCompleteGamepad(progress: GamepadProgress) {
+function legacyCompletionRequirements(progress: GamepadProgress) {
   return gamepadReadings.every(section => progress.read.includes(section.id)) && progress.labDone &&
     gamepadCodeScore(progress) === gamepadCodeTasks.length && gamepadQuizPassed(progress)
 }
+export function canCompleteGamepad(progress: GamepadProgress) {
+  return legacyCompletionRequirements(progress) && progress.scenarioAnswer === gamepadScenario.answer
+}
 export function gamepadProgressPercent(progress: GamepadProgress) {
   const steps = progress.read.length + Number(progress.labDone) + Number(gamepadCodeScore(progress) === gamepadCodeTasks.length) +
-    Number(gamepadQuizPassed(progress)) + Number(progress.completed && canCompleteGamepad(progress))
-  return Math.round(steps / 8 * 100)
+    Number(gamepadQuizPassed(progress)) + Number(progress.scenarioAnswer === gamepadScenario.answer) + Number(progress.completed && canCompleteGamepad(progress))
+  return Math.round(steps / 9 * 100)
 }
 export function normalizeGamepadProgress(value: unknown): GamepadProgress {
-  const progress: GamepadProgress = { read: [], code: {}, answers: {}, labDone: false, completed: false }
+  const progress: GamepadProgress = { assessmentVersion: 2, previouslyCompleted: false, read: [], code: {}, answers: {}, labDone: false, completed: false }
   if (!isRecord(value)) return progress
   if (Array.isArray(value.read)) {
     const read = value.read
@@ -125,14 +139,24 @@ export function normalizeGamepadProgress(value: unknown): GamepadProgress {
     }
   }
   progress.labDone = value.labDone === true
+  const scenarioAnswer = value.scenarioAnswer
+  if (typeof scenarioAnswer === 'number' && Number.isInteger(scenarioAnswer) && scenarioAnswer >= 0 && scenarioAnswer < gamepadScenario.options.length) progress.scenarioAnswer = scenarioAnswer
+  progress.previouslyCompleted = value.previouslyCompleted === true ||
+    ((value.assessmentVersion === undefined || value.assessmentVersion === 1) && value.completed === true && legacyCompletionRequirements(progress))
   progress.completed = value.completed === true && canCompleteGamepad(progress)
   return progress
 }
+// v1 remains an untouched backup; v2 is the current assessment record.
 export function loadGamepadProgress(): GamepadProgress {
-  try { return normalizeGamepadProgress(JSON.parse(localStorage.getItem(gamepadStorageKey) ?? 'null')) }
-  catch { return normalizeGamepadProgress(null) }
+  try {
+    const current = localStorage.getItem(gamepadStorageKey)
+    if (current !== null) {
+      try { const parsed: unknown = JSON.parse(current); if (isRecord(parsed)) return normalizeGamepadProgress(parsed) } catch { /* recover from the v1 backup below */ }
+    }
+    return normalizeGamepadProgress(JSON.parse(localStorage.getItem(legacyGamepadStorageKey) ?? 'null'))
+  } catch { return normalizeGamepadProgress(null) }
 }
-export function saveGamepadProgress(progress: GamepadProgress) {
-  try { localStorage.setItem(gamepadStorageKey, JSON.stringify(progress)); return true }
+export function saveGamepadProgress(progress: GamepadProgress): boolean {
+  try { localStorage.setItem(gamepadStorageKey, JSON.stringify(normalizeGamepadProgress(progress))); return true }
   catch { return false }
 }

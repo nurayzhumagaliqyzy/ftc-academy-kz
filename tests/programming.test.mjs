@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { afterEach, test } from 'node:test'
 import {
-  canComplete, concepts, loadProgress, matchingScore, normalizeProgress,
+  sdkScenario, canComplete, concepts, loadProgress, matchingScore, normalizeProgress,
   progressPercent, questions, quizPassed, quizScore, readingSections, saveProgress, storageKey,
 } from '../src/programming/model.ts'
 
@@ -12,7 +12,7 @@ afterEach(() => {
 })
 
 function readyProgress() {
-  return normalizeProgress({
+  return normalizeProgress({ assessmentVersion: 2, scenarioAnswer: sdkScenario.answer,
     read: readingSections.map(section => section.id),
     matches: Object.fromEntries(concepts.map(concept => [concept.id, concept.answer])),
     answers: Object.fromEntries(questions.map(question => [question.id, question.answer])),
@@ -31,7 +31,7 @@ test('fresh and malformed progress starts safely without false completion', () =
     matches: { sdk: 'tools', active: 'unknown', unexpected: 'tools' },
     answers: { sdk: 99, opmode: -1, modes: 0.5, start: '1', telemetry: 0 },
     completed: true,
-  }), { read: ['intro'], matches: { sdk: 'tools' }, answers: { telemetry: 0 }, completed: false })
+  }), { assessmentVersion: 2, previouslyCompleted: false, read: ['intro'], matches: { sdk: 'tools' }, answers: { telemetry: 0 }, completed: false })
 })
 
 test('completion requires theory, correct matches, all quiz answers, and 4/5', () => {
@@ -39,7 +39,7 @@ test('completion requires theory, correct matches, all quiz answers, and 4/5', (
   assert.equal(matchingScore(progress), 5)
   assert.equal(quizScore(progress), 5)
   assert.equal(canComplete(progress), true)
-  assert.equal(progressPercent(progress), 86)
+  assert.equal(progressPercent(progress), 88)
   progress.answers.sdk = 0
   assert.equal(quizPassed(progress), true)
   progress.completed = true

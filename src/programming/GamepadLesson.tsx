@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { LessonCodeExercise, LessonNavigation, LessonQuiz, ReadingSection } from './LessonComponents'
+import { LessonScenario, PreviousCompletionNotice, LessonCodeExercise, LessonNavigation, LessonQuiz, ReadingSection } from './LessonComponents'
 import { GamepadLab } from './GamepadLab'
 import {
-  canCompleteGamepad, gamepadCodeTasks, gamepadCodeScore, gamepadJavaExample, gamepadProgressPercent,
+  gamepadScenario, canCompleteGamepad, gamepadCodeTasks, gamepadCodeScore, gamepadJavaExample, gamepadProgressPercent,
   gamepadQuestions, gamepadQuizPassed, gamepadQuizScore, gamepadReadings, loadGamepadProgress,
   normalizeGamepadProgress, saveGamepadProgress,
 } from './gamepadModel'
@@ -46,11 +46,12 @@ export function GamepadLesson() {
     <section className="hw-panel pl-progress" aria-labelledby="gl-progress">
       <div className="hw-section-head"><h2 id="gl-progress">Сабақтағы прогресс</h2><span className="hw-count">{percent}% · {progress.completed ? 'Аяқталды' : 'Оқу барысында'}</span></div>
       <progress className="hw-meter" max={100} value={percent} aria-label="Үшінші сабақтағы прогресс">{percent}%</progress>
-      <p>Теория: {progress.read.length}/4 · Lab: {progress.labDone ? 'орындалды' : 'әлі орындалмады'} · Java: {gamepadCodeScore(progress)}/5 · Тест: {gamepadQuizScore(progress)}/5</p>
-      <p className="hw-muted" role="status">{storageAvailable ? 'Осы сабақтың прогресі браузерде бөлек сақталады. Алдыңғы сабақтардың нәтижелері сақталады.' : 'Браузерде сақтау қолжетімсіз. Бетті жапқанда осы сабақтағы жаңа прогресс жоғалады.'}</p>
+      <p>Теория: {progress.read.length}/4 · Lab: {progress.labDone ? 'орындалды' : 'әлі орындалмады'} · Java: {gamepadCodeScore(progress)}/5 · Тест: {gamepadQuizScore(progress)}/5 · Жағдаят: {progress.scenarioAnswer === gamepadScenario.answer ? 'орындалды' : 'әлі орындалмады'}</p>
+      <PreviousCompletionNotice show={progress.previouslyCompleted && !progress.completed} />
+        <p className="hw-muted" role="status">{storageAvailable ? 'Осы сабақтың прогресі браузерде бөлек сақталады. Алдыңғы сабақтардың нәтижелері сақталады.' : 'Браузерде сақтау қолжетімсіз. Бетті жапқанда осы сабақтағы жаңа прогресс жоғалады.'}</p>
     </section>
     <nav className="pl-jumps" aria-label="Үшінші сабақ бөлімдері">
-      {[['controller', 'Теория'], ['lab', 'Gamepad Lab'], ['code-exercise', 'Java тапсырмасы'], ['example', 'Толық Java мысалы'], ['quiz', 'Тест'], ['completion', 'Аяқтау']].map(([id, label]) => <button type="button" className="hw-button hw-button-secondary" key={id} onClick={() => jumpTo(id)}>{label}</button>)}
+      {[['controller', 'Теория'], ['lab', 'Gamepad Lab'], ['code-exercise', 'Java тапсырмасы'], ['example', 'Толық Java мысалы'], ['quiz', 'Тест'], ['scenario', 'Жағдаят'], ['completion', 'Аяқтау']].map(([id, label]) => <button type="button" className="hw-button hw-button-secondary" key={id} onClick={() => jumpTo(id)}>{label}</button>)}
     </nav>
     <section className="hw-panel" aria-labelledby="gl-objectives">
       <p className="hw-kicker">БҮГІН НЕ ҮЙРЕНЕСІҢ?</p><h2 id="gl-objectives">Оқу мақсаттары</h2>
@@ -60,6 +61,7 @@ export function GamepadLesson() {
         <li>Joystick (басқару тетігі) Y мәнінің таңбасын оқып, мотор қуатын есептейсің.</li>
         <li>Gamepad кірісін DC Motor (тұрақты ток қозғалтқышы) қуатымен байланыстыратын Java кодын толықтырасың.</li>
       </ul>
+      <p className="pl-outcome"><b>Күтілетін нәтиже:</b> Joystick Y мәнінен мотор қуатын есептеп, таңба мен бағытты түсіндіресің; нөлдік кірістің әсерін анықтайсың.</p>
       <p className="pl-prerequisite">Дайындық: <a className="hw-back" href="#programming/dc-motor">2-сабақтағы setPower() және моторды тоқтатуды қайтала →</a></p>
     </section>
     <ReadingSection {...readingProps('controller')}>
@@ -108,12 +110,17 @@ export function GamepadLesson() {
     <LessonQuiz id="gl-quiz" questions={gamepadQuestions} answers={progress.answers}
       onAnswer={(id, answer) => update(previous => previous.answers[id] !== undefined ? previous : { ...previous, answers: { ...previous.answers, [id]: answer } })}
       onRetry={() => update(previous => ({ ...previous, answers: {}, completed: false }))}
-      retryNote="Қайта бастағанда тек тест жауаптары мен аяқталу белгісі жаңарады. Теория, Lab және Java тапсырмасы сақталады." />
+      retryNote="Қайта бастағанда тек тест жауаптары мен аяқталу белгісі жаңарады. Теория, Lab, Java тапсырмасы және жағдаят сақталады." />
+    <LessonScenario id="gl-scenario" question={gamepadScenario} answer={progress.scenarioAnswer}
+      onAnswer={answer => update(previous => previous.scenarioAnswer !== undefined ? previous : { ...previous, scenarioAnswer: answer })}
+      onRetry={() => update(previous => ({ ...previous, scenarioAnswer: undefined, completed: false }))} />
+
     <section className="hw-panel" aria-labelledby="gl-completion">
       <h2 id="gl-completion" tabIndex={-1}>Сабақты аяқтау</h2>
-      <ul className="pl-checklist"><li>{progress.read.length === 4 ? '✓' : '○'} Теорияны оқу ({progress.read.length}/4)</li><li>{progress.labDone ? '✓' : '○'} Lab-та екі бағытты байқап, нөлге қайтару</li><li>{gamepadCodeScore(progress) === 5 ? '✓' : '○'} Java тапсырмасы ({gamepadCodeScore(progress)}/5)</li><li>{gamepadQuizPassed(progress) ? '✓' : '○'} Тест: бес сұраққа жауап және кемінде 4/5 ({answered}/5 жауап, {gamepadQuizScore(progress)}/5 дұрыс)</li></ul>
+      <ul className="pl-checklist"><li>{progress.read.length === 4 ? '✓' : '○'} Теорияны оқу ({progress.read.length}/4)</li><li>{progress.labDone ? '✓' : '○'} Lab-та екі бағытты байқап, нөлге қайтару</li><li>{gamepadCodeScore(progress) === 5 ? '✓' : '○'} Java тапсырмасы ({gamepadCodeScore(progress)}/5)</li><li>{gamepadQuizPassed(progress) ? '✓' : '○'} Тест: бес сұраққа жауап және кемінде 4/5 ({answered}/5 жауап, {gamepadQuizScore(progress)}/5 дұрыс)</li>  <li>{progress.scenarioAnswer === gamepadScenario.answer ? '✓' : '○'} Қолданбалы жағдаятты дұрыс орындау</li>
+        </ul>
       <button type="button" className="hw-button" disabled={!ready || progress.completed} onClick={() => update(previous => ({ ...previous, completed: true }))}>{progress.completed ? '✓ Сабақ аяқталды' : 'Сабақты аяқтадым'}</button>
-      <p role="status">{progress.completed ? 'Жарайсың! Тетік мәнін мотор қуатына айналдыруды меңгердің. Сабаққа қайта оралып, жаттыға аласың.' : 'Аяқтау батырмасы жоғарыдағы төрт шарт орындалғанда ашылады.'}</p>
+      <p role="status">{progress.completed ? 'Жарайсың! Тетік мәнін мотор қуатына айналдыруды меңгердің. Сабаққа қайта оралып, жаттыға аласың.' : 'Аяқтау батырмасы жоғарыдағы бес шарт орындалғанда ашылады.'}</p>
     </section>
     <LessonNavigation current="gamepad-teleop" pager />
     <section className="hw-panel" aria-labelledby="gl-sources"><h2 id="gl-sources">Ресми дереккөздер</h2><p>FIRST Tech Challenge құжаттамасы · тексерілген күні: 12.11.2026. Сілтемелер English тілінде, жаңа бетте ашылады.</p>

@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import {
-  canComplete, concepts, functions, loadProgress, matchingScore, normalizeProgress,
+  sdkScenario, canComplete, concepts, functions, loadProgress, matchingScore, normalizeProgress,
   progressPercent, questions, quizPassed, quizScore, readingSections, saveProgress,
 } from './model'
 import type { Progress, ReadingId } from './model'
-import { LessonNavigation, LessonQuiz, ReadingSection as SharedReadingSection } from './LessonComponents'
+import { LessonScenario, PreviousCompletionNotice, LessonNavigation, LessonQuiz, ReadingSection as SharedReadingSection } from './LessonComponents'
 import './programming.css'
 
 const javaExample = `package org.firstinspires.ftc.teamcode;
@@ -79,7 +79,7 @@ export function ProgrammingLesson() {
         <span className="language">ҚАЗ</span>
       </header>
       <div className="hw-banner">
-        <a className="hw-back" href="#programming">← Оқу бағыттарына қайту</a>
+        <a className="hw-back" href="#programming/lessons">← Сабақтар тізіміне қайту</a>
         <p className="hw-kicker">БАҒДАРЛАМАЛАУ / 1-САБАҚ</p>
         <h1 ref={heading} tabIndex={-1}>FTC SDK және OpMode негіздері</h1>
         <p>Робот бағдарламасының құрылымын түсін. Ұғымдарды сәйкестендіріп, біліміңді тексер.</p>
@@ -94,7 +94,8 @@ export function ProgrammingLesson() {
           <span className="hw-count">{percent}% · {progress.completed ? 'Аяқталды' : 'Оқу барысында'}</span>
         </div>
         <progress className="hw-meter" max={100} value={percent} aria-label="Сабақтағы прогресс">{percent}%</progress>
-        <p>Теория: {progress.read.length}/4 · Сәйкестендіру: {matched}/5 · Тест: {score}/5 дұрыс ({answered}/5 жауап берілді)</p>
+        <p>Теория: {progress.read.length}/4 · Сәйкестендіру: {matched}/5 · Тест: {score}/5 дұрыс ({answered}/5 жауап берілді) · Жағдаят: {progress.scenarioAnswer === sdkScenario.answer ? 'орындалды' : 'әлі орындалмады'}</p>
+        <PreviousCompletionNotice show={progress.previouslyCompleted && !progress.completed} />
         <p className="hw-muted">{storageAvailable ? 'Прогресс осы браузерде автоматты сақталады.' : 'Браузерде сақтау қолжетімсіз. Бетті жапқанда прогресс жоғалады.'}</p>
       </section>
 
@@ -103,6 +104,7 @@ export function ProgrammingLesson() {
         <button className="hw-button hw-button-secondary" type="button" onClick={() => jumpTo('code')}>Java мысалы</button>
         <button className="hw-button hw-button-secondary" type="button" onClick={() => jumpTo('matching')}>Сәйкестендіру</button>
         <button className="hw-button hw-button-secondary" type="button" onClick={() => jumpTo('quiz')}>Тест</button>
+        <button className="hw-button hw-button-secondary" type="button" onClick={() => jumpTo('scenario')}>Жағдаят</button>
         <button className="hw-button hw-button-secondary" type="button" onClick={() => jumpTo('completion')}>Аяқтау</button>
       </nav>
 
@@ -110,16 +112,17 @@ export function ProgrammingLesson() {
         <p className="hw-kicker">БҮГІН НЕ ҮЙРЕНЕСІҢ?</p>
         <h2 id="pl-objectives">Оқу мақсаттары</h2>
         <ul className="hw-list">
-          <li>FTC SDK (бағдарламалық әзірлеу жинағы) мен OpMode (роботты басқару бағдарламасы) қызметін түсіндіресің.</li>
+          <li>FTC SDK (бағдарламалық әзірлеу жинағы) мен OpMode (роботты басқару бағдарламасы) қызметін түсінесің.</li>
           <li>TeleOp (оператор басқаратын режим) пен Autonomous (автономды режим) айырмасын ажыратасың.</li>
           <li>Java мысалынан START пәрменін күтуді, белсенді циклді және экранға дерек жіберуді табасың.</li>
         </ul>
-        <p className="pl-prerequisite">Алдын ала: команда, айнымалы және цикл туралы бастапқы түсінік жеткілікті. Бұл сабақ үшін робот қажет емес.</p>
+        <p className="pl-outcome"><b>Күтілетін нәтиже:</b> OpMode орындалу ретін тексеріп, START-қа дейін берілген қозғалыс пәрменінің қатесін табасың.</p>
+      <p className="pl-prerequisite">Алдын ала: команда, айнымалы және цикл туралы бастапқы түсінік жеткілікті. Бұл сабақ үшін робот қажет емес.</p>
       </section>
 
       <ReadingSection {...readingProps('intro')}>
         <p>FIRST Tech Challenge (FTC — робототехника жарысы) командасы роботтың не істейтінін бағдарламада сипаттайды. Java (бағдарламалау тілі) арқылы сол нұсқауларды жаза аламыз.</p>
-        <p>Control Hub (басқару блогы) ішіндегі Robot Controller (робот бағдарламасын орындайтын қолданба) таңдалған бағдарламаны іске қосады. Driver Station (оператордың басқару қолданбасы) арқылы бағдарламаны таңдап, іске қосып, тоқтатамыз.</p>
+        <p>Control Hub (басқару блогы) ішіндегі Robot Controller (робот бағдарламасын орындайтын қолданба) таңдалған бағдарламаны іске қосады. Driver Station (оператор станциясы) арқылы бағдарламаны таңдап, іске қосып, тоқтатамыз.</p>
         <p>Gamepad (ойын контроллері) батырмаларының күйін оқу — бағдарламаға кіріс дерек алу мысалы. DC Motor (тұрақты ток қозғалтқышы) қуатын өзгерту — роботқа пәрмен беру мысалы. Бүгін тек деректі оқып, экранға шығаруды қарастырамыз.</p>
       </ReadingSection>
 
@@ -191,7 +194,11 @@ export function ProgrammingLesson() {
           ...previous, answers: { ...previous.answers, [id]: answer },
         })}
         onRetry={() => update(previous => ({ ...previous, answers: {}, completed: false }))}
-        retryNote="Қайта бастағанда тест жауаптары мен сабақтың аяқталу белгісі жаңартылады. Теория және сәйкестендіру сақталады." />
+        retryNote="Қайта бастағанда тест жауаптары мен сабақтың аяқталу белгісі жаңартылады. Теория, сәйкестендіру және жағдаят сақталады." />
+
+    <LessonScenario id="pl-scenario" question={sdkScenario} answer={progress.scenarioAnswer}
+      onAnswer={answer => update(previous => previous.scenarioAnswer !== undefined ? previous : { ...previous, scenarioAnswer: answer })}
+      onRetry={() => update(previous => ({ ...previous, scenarioAnswer: undefined, completed: false }))} />
 
       <section className="hw-panel" aria-labelledby="pl-completion">
         <h2 id="pl-completion" tabIndex={-1}>Сабақты аяқтау</h2>
@@ -199,6 +206,7 @@ export function ProgrammingLesson() {
           <li>{progress.read.length === 4 ? '✓' : '○'} Төрт теория бөлімін оқылған деп белгілеу ({progress.read.length}/4)</li>
           <li>{matched === 5 ? '✓' : '○'} Бес ұғымды дұрыс сәйкестендіру ({matched}/5)</li>
           <li>{quizPassed(progress) ? '✓' : '○'} Бес сұраққа жауап беру және кемінде 4/5 жинау ({answered}/5 жауап, {score}/5 дұрыс)</li>
+          <li>{progress.scenarioAnswer === sdkScenario.answer ? '✓' : '○'} Қолданбалы жағдаятты дұрыс орындау</li>
         </ul>
         <button className="hw-button" type="button" disabled={!ready || progress.completed} aria-describedby="pl-completion-help"
           onClick={() => update(previous => ({ ...previous, completed: true }))}>
@@ -206,7 +214,7 @@ export function ProgrammingLesson() {
         </button>
         <div aria-live="polite" aria-atomic="true">
           <p id="pl-completion-help" className={progress.completed ? 'hw-success' : 'hw-muted'}>
-            {progress.completed ? 'Жарайсың! FTC SDK және OpMode негіздерін меңгердің.' : ready ? 'Барлық шарт орындалды. Аяқтау батырмасын бас.' : 'Батырма жоғарыдағы үш шарт орындалғанда ашылады.'}
+            {progress.completed ? 'Жарайсың! FTC SDK және OpMode негіздерін меңгердің.' : ready ? 'Барлық шарт орындалды. Аяқтау батырмасын бас.' : 'Батырма жоғарыдағы төрт шарт орындалғанда ашылады.'}
           </p>
         </div>
       </section>
