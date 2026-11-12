@@ -87,7 +87,7 @@ export function MotorLesson() {
     <section className="hw-panel" aria-labelledby="ml-objectives">
       <p className="hw-kicker">БҮГІН НЕ ҮЙРЕНЕСІҢ?</p><h2 id="ml-objectives">Оқу мақсаттары</h2>
       <ul className="hw-list">
-        <li>DC Motor қызметін және Control Hub (басқару блогы) қосылымын түсіндіресің.</li>
+        <li>DC Motor қызметін және оның Control Hub-қа (басқару блогына) қосылу жолын түсінесің.</li>
         <li>Оң, теріс және нөлдік қуаттың FORWARD (негізгі бағыт) / REVERSE (кері бағыт) баптауымен байланысын ажыратасың.</li>
         <li>FTC SDK (бағдарламалық әзірлеу жинағы) ішіндегі <code>DcMotor</code>, <code>hardwareMap.get()</code>, <code>setPower()</code> және <code>setDirection()</code> қолданылуын танисың.</li>
         <li>Моторды іске қосу мен тоқтату кодын оқып, жиі кездесетін қателерді табасың.</li>
