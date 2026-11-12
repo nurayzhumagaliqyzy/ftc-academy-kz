@@ -10,9 +10,9 @@ export function LessonNavigation({ current, pager = false }: { current: LessonId
     const previous = programmingLessons[index - 1]
     const next = programmingLessons[index + 1]
     return <nav className="pl-lesson-pager" aria-label="Алдыңғы және келесі сабақ">
-      {previous && <a className="hw-button hw-button-secondary" href={'#' + previous.hash}>← 1-сабақ: {previous.title}</a>}
+      {previous && <a className="hw-button hw-button-secondary" href={'#' + previous.hash}>← {index}-сабақ: {previous.title}</a>}
       <a className="hw-button hw-button-secondary" href="#programming/lessons">Барлық сабақ</a>
-      {next && <a className="hw-button" href={'#' + next.hash}>2-сабақ: {next.title} →</a>}
+      {next && <a className="hw-button" href={'#' + next.hash}>{index + 2}-сабақ: {next.title} →</a>}
     </nav>
   }
   return <nav className="hw-tabs pl-lesson-tabs" aria-label="FTC Programming сабақтары">
@@ -82,5 +82,29 @@ export function LessonQuiz({ id, questions, answers, onAnswer, onRetry, retryNot
       target?.scrollIntoView({ block: 'start' })
     }}>Тестті қайта бастау</button>
     <p className="hw-muted pl-retry-note">{retryNote}</p>
+  </section>
+}
+
+export type CodeTask = { id: string; prompt: string; before: string; after: string; options: readonly string[]; answer: string; explanation: string }
+export function LessonCodeExercise({ id, tasks, answers, onChange }: {
+  id: string; tasks: readonly CodeTask[]; answers: Record<string, string>; onChange: (id: string, value: string) => void
+}) {
+  return <section className="hw-panel" aria-labelledby={id}>
+    <div className="hw-section-head"><div><p className="hw-kicker">JAVA / БОС ОРЫНДЫ ТОЛТЫР</p><h2 id={id} tabIndex={-1}>TeleOp кодын толықтыр</h2></div><span className="hw-count">{tasks.filter(task => answers[task.id] === task.answer).length}/{tasks.length} дұрыс</span></div>
+    <p>Әр үзіндіге сәйкес Java бөлігін таңда. Қате жауапты өзгерте аласың. Бұл — оқу тапсырмасы, Java компиляторы емес; код орындалмайды.</p>
+    <div className="pl-matches">
+      {tasks.map((task, index) => {
+        const selected = answers[task.id] ?? ''
+        return <div className="hw-detail" key={task.id}>
+          <label className="pl-match-label" htmlFor={`${id}-${task.id}`}>{index + 1}. {task.prompt}</label>
+          <pre className="gl-live-code"><code lang="en">{task.before}<mark>{selected || '___'}</mark>{task.after}</code></pre>
+          <select id={`${id}-${task.id}`} value={selected} aria-describedby={selected ? `${id}-${task.id}-feedback` : undefined} onChange={event => onChange(task.id, event.target.value)}>
+            <option value="">Java бөлігін таңда…</option>{task.options.map(option => <option key={option} value={option}>{option}</option>)}
+          </select>
+          <div aria-live="polite" aria-atomic="true">{selected && <div className="hw-feedback" id={`${id}-${task.id}-feedback`} data-kind={selected === task.answer ? 'good' : 'bad'}><strong>{selected === task.answer ? '✓ Дұрыс!' : 'Бұл бөлік сәйкес емес.'}</strong><p>{task.explanation}</p></div>}</div>
+        </div>
+      })}
+    </div>
+    <p className="hw-muted">Бұл — жеке үзінділер. Толық бағдарламаның реті төменде берілген.</p>
   </section>
 }

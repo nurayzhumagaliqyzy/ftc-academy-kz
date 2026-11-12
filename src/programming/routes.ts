@@ -1,6 +1,7 @@
 export const programmingLessons = [
   { id: 'sdk-opmode', title: 'FTC SDK және OpMode негіздері', hash: 'programming/sdk-opmode' },
   { id: 'dc-motor', title: 'DC Motor басқару', hash: 'programming/dc-motor' },
+  { id: 'gamepad-teleop', title: 'Gamepad және TeleOp', hash: 'programming/gamepad-teleop' },
 ] as const
 
 export type LessonId = (typeof programmingLessons)[number]['id']

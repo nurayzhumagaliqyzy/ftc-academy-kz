@@ -1,6 +1,6 @@
 # FTC Academy KZ
 
-FTC робототехникасын қазақ тілінде үйренуге арналған оқу веб-құралы. React, TypeScript және Vite қолданылды. Басты бет, FTC Hardware модулі және FTC Programming бөлімінің екі сабағы бар. Robot Simulator карточкасы алдағы модуль ретінде белгіленген.
+FTC робототехникасын қазақ тілінде үйренуге арналған оқу веб-құралы. React, TypeScript және Vite қолданылды. Басты бет, FTC Hardware модулі және FTC Programming бөлімінің үш сабағы бар. Robot Simulator карточкасы алдағы модуль ретінде белгіленген.
 
 ## Жергілікті іске қосу
 
@@ -113,7 +113,7 @@ npm install
 npm run dev
 ```
 
-Терминалда көрсетілген Local URL-ге `/#programming/dc-motor` жалғаңыз. PR үшін Vercel Preview жасалса, сол deployment мекенжайын қолданыңыз. Бұл PR автоматты түрде main-ге біріктірілмейді; production сайт main-ге біріктірілгенше бірінші сабақтағы нұсқада қалады.
+Терминалда көрсетілген Local URL-ге `/#programming/dc-motor` жалғаңыз. PR үшін Vercel Preview жасалса, сол deployment мекенжайын қолданыңыз. 2-сабақ PR #2 арқылы 12.11.2026 күні main тармағына біріктіріліп, production-де жарияланды.
 
 ### Екінші сабақтың қосымша ресми дереккөздері
 
@@ -124,3 +124,52 @@ npm run dev
 - [Motor Modes және Encoders](https://ftc-docs.firstinspires.org/en/latest/tech_tips/tech-tips/tech-tip-motor-modes/tech-tip-motor-modes.html)
 - [DcMotorSimple API: setPower, setDirection](https://javadoc.io/static/org.firstinspires.ftc/RobotCore/10.2.0/com/qualcomm/robotcore/hardware/DcMotorSimple.html)
 - [ZeroPowerBehavior API: BRAKE және FLOAT](https://javadoc.io/static/org.firstinspires.ftc/RobotCore/10.3.0/com/qualcomm/robotcore/hardware/DcMotor.ZeroPowerBehavior.html)
+
+
+## FTC Programming · 3-сабақ
+
+**Gamepad (ойын контроллері) және TeleOp (оператор басқаратын режим)** екінші сабақтағы мотор басқаруына сүйенеді. Сабақтар тізімінен 3-сабақты таңдаңыз немесе `/#programming/gamepad-teleop` ашыңыз. Алдыңғы екі сабақтың URL-дері мен сақтау пішімдері өзгермеді. 2-сабақтан 3-сабаққа келесі сілтеме, 3-сабақтан 2-сабаққа алдыңғы сілтеме бар. Іске аспаған сабаққа сілтеме жоқ.
+
+Сабақ құрамында төрт теория бөлімі (Gamepad/Driver Station, режимдер, Joystick Y, басқару циклі), Gamepad Lab, бес Java бос орын тапсырмасы, толық GamepadMotor.java мысалы және бес сұрақтық тест бар. Қазақша түсіндірмелер, алғашқы қолданыста термин түсіндірмелері және дереу кері байланыс берілген.
+
+### Gamepad Lab басқаруы
+
+- Тетікті тінтуірмен немесе саусақпен тік бағытта сүйреңіз. Pointer Events пен pointer capture қолданылады. Жіберу, pointer cancel немесе capture жоғалуы тетікті ортаға қайтарады.
+- Tab арқылы тетікті таңдаңыз: ↑ Y-ті 0.10-ға азайтады, ↓ арттырады; Home −1, End +1; Space немесе Escape нөлдейді. «Алға»/«Артқа» батырмалары −0.50/+0.50 мәнін орнатады; «Нөлге қайтару» оларды нөлдейді.
+- Перне/батырма мәндері зерттеу үшін сақталады; тетіктен фокус кетсе, терезе фокусы жоғалса немесе бет жасырылса нөлденеді. Қозғалыс күйі localStorage-ға жазылмайды.
+- Мәндер −1…+1 шегінде: `power = -gamepad1.left_stick_y`. Қуат жолағы нөлден екі жаққа таралады, таңба, сан, шартты бағыт және Java-дағы есептелген пәрмен көрінеді. Мысалы, Y = −0.50 → power = +0.50.
+- Lab — нақты құрылғыға қосылмайтын оқу моделі. Тұрақты анимация қарқыны RPM білдірмейді. Нақты жылдамдық моторға, жүктемеге, батареяға тәуелді; сағат тілі бағыты шартты. Reduced-motion стилінде айналу анимациясы өшіріледі.
+
+### Прогресс және аяқтау
+
+Үшінші сабақтың жеке кілті: `ftc-academy-kz:programming:gamepad-teleop:v1`. Теория белгілері, Lab аяқталуы, Java таңдаулары, тест жауаптары мен аяқталу белгісі сақталады. Алдыңғы сабақтар мен Hardware кілттеріне жазылмайды. Жарамсыз деректер қалыпқа келтіріледі; сақтау бұғатталса, ескерту беріледі.
+
+Аяқтау: теория 4/4, Lab-та екі таңбаны байқап нөлге қайту, Java 5/5, тесттің барлық сұрағына жауап және кемінде 4/5; содан кейін «Сабақты аяқтадым». Retry тек тест жауаптары мен аяқталу белгісін тазартады. Аяқталған сабақты қайта ашуға болады.
+
+### Үшінші сабақтың тексеруі · 12.11.2026
+
+- `npm test`: 23/23 өтті (алдыңғы 14 және жаңа 9). Үш маршрут, 201 Y мәнінің қуатқа айналуы, pointer координаттары/шекаралары, жарамсыз мәндер, 4/5 өту шегі, аяқтау шарттары, бүлінген деректер, storage қателері және үш сабақ/Hardware оқшаулануы қамтылды.
+- `npm run typecheck`: өтті. `npm run build`: өтті, Vite 8.3.7. Жаңа dependency қосылған жоқ.
+- Жергілікті браузерде тінтуірмен жоғары/төмен сүйреу және жібергенде нөлдену, Home/End/Escape, батырмалар, Y/қуат/бағыт/код жаңаруы тексерілді.
+- Java қате/дұрыс жауабы, Java 5/5, тесттен 4/5 алу, 100% аяқтау, refresh-тен кейін қалпына келу және нөлдік Lab күйі, қайта ашу, retry тексерілді. Алдыңғы екі сабақтың прогресі тізімде сақталды (14% және 13%); автоматты тесттер олардың сақтау деректерін де салыстырады.
+- Үш сабақ тізімі, 1↔2↔3 навигациясы, Hardware Explorer және Control Hub карточкасы тексерілді. Басты бет пен Hardware файлдары өзгермеді.
+- 390 және 320 CSS px viewport-тарда бетте көлденең overflow болмады; мобильді мәзір/Escape жұмыс істеді. Қайталанған id және іске аспаған сабақ сілтемелері табылмады. Қолданба console error берген жоқ.
+- Нақты сенсорлық телефон, физикалық Gamepad/робот және Java-ны толық FTC SDK жобасында компиляциялау тексерілмеді. OS reduced-motion параметрі жеке тексерілген жоқ. Lab pointer cancel/visibility reset қорғанысы кодта бар; бұл тармақтар жеке UI сынағынан өткен жоқ.
+
+### Үшінші сабақты preview-де ашу
+
+Node.js 22.12+ ортасында **репозиторий қалтасының ішінде** орындаңыз:
+
+```sh
+git fetch origin
+git switch feat/programming-gamepad-teleop
+npm install
+npm run dev
+```
+
+Терминалдағы Local URL-ге `/#programming/gamepad-teleop` жалғаңыз немесе **Бағдарламалау → 3-сабақ** таңдаңыз. Бос терминалда `npm run dev` орындамаңыз: ағымдағы қалтада package.json болуы керек. PR main тармағына бағытталған, автоматты біріктіру қосылмайды. Vercel Preview қорғалған болса, Vercel аккаунтына кіру қажет; main-ге біріктірілгенше production-де алғашқы екі сабақ қалады.
+
+### Үшінші сабақтың ресми дереккөздері
+
+- [FIRST OnBot Java: Gamepad Y таңбасы, gamepad1/gamepad2 тағайындау, TeleOp, Driver Station, telemetry және motor.setPower](https://ftc-docs.firstinspires.org/en/latest/programming_resources/tutorial_specific/onbot_java/creating_op_modes/Creating-and-Running-an-Op-Mode-(OnBot-Java).html)
+- [FIRST-Tech-Challenge: BasicOpMode_Linear.java ресми үлгісі](https://github.com/FIRST-Tech-Challenge/FtcRobotController/blob/master/FtcRobotController/src/main/java/org/firstinspires/ftc/robotcontroller/external/samples/BasicOpMode_Linear.java)
