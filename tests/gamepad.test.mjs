@@ -20,9 +20,9 @@ function readyProgress() {
     answers: Object.fromEntries(gamepadQuestions.map(question => [question.id, question.answer])),
   })
 }
-test('three lesson routes are unique and stop at the implemented third lesson', () => {
-  assert.deepEqual(programmingLessons.map(lesson => programmingSectionFor(lesson.hash)), ['sdk-opmode', 'dc-motor', 'gamepad-teleop'])
-  assert.equal(new Set(programmingLessons.map(lesson => lesson.hash)).size, 3)
+test('first three lesson routes remain stable and registered hashes are unique', () => {
+  assert.deepEqual(programmingLessons.slice(0, 3).map(lesson => programmingSectionFor(lesson.hash)), ['sdk-opmode', 'dc-motor', 'gamepad-teleop'])
+  assert.equal(new Set(programmingLessons.map(lesson => lesson.hash)).size, programmingLessons.length)
   assert.equal(programmingSectionFor('programming/gamepad-teleop/other'), undefined)
   assert.equal(programmingSectionFor('hardware/explorer'), undefined)
 })

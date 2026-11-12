@@ -1,0 +1,53 @@
+.al-lab-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:24px; margin-top:20px; align-items:start; }
+.al-lab-grid > div { min-width:0; }
+.al-challenges { display:flex; flex-wrap:wrap; gap:8px; margin:18px 0; }
+.al-challenges .hw-button { flex:1 1 160px; min-height:48px; }
+.al-challenges [aria-pressed='true'] { border-color:var(--cyan); color:#baf8ff; background:#193e51; }
+.programming-lesson .al-challenge-title { margin:18px 0 6px; color:#d4f3ff; }
+.al-field { margin:0; padding:8px; background:#091929; border:1px solid #385873; border-radius:14px; }
+.al-field svg { display:block; width:100%; height:auto; overflow:hidden; }
+.al-field figcaption { padding:0 10px 10px; font-size:.78rem; line-height:1.6; color:#bdd0e2; }
+.al-field-background { fill:#10283b; }
+.al-grid-lines { stroke:#34546d; stroke-width:1; }
+.al-coordinates { fill:#c6d9e9; font:14px var(--mono); }
+.al-wall { fill:#4a596b; stroke:#9caaba; stroke-width:1; }
+.al-wall-cross { stroke:#d7e0e8; stroke-width:2; }
+.al-start { fill:#15516b; stroke:#70d6ef; stroke-dasharray:4 3; stroke-width:2; }
+.al-start-label { fill:#b4e9f9; font:14px var(--mono); }
+.al-target { fill:#413a21; stroke:#f0cd78; stroke-width:2; stroke-dasharray:5 3; }
+.al-target-label { fill:#ffe5a0; font:28px sans-serif; }
+.al-path { fill:none; stroke:#67e6ed; stroke-width:5; stroke-linecap:round; stroke-linejoin:round; opacity:.8; }
+.al-path-dot { fill:#c0f9ff; }
+.al-wheel { fill:#7190a5; stroke:#d1e6f1; }
+.al-robot-body { fill:#3cbacb; stroke:#b6f5ff; stroke-width:2; }
+.al-robot-nose { fill:#e2fcff; stroke:#0c3646; stroke-width:1; }
+.al-robot-core { fill:#10405a; }
+.al-robot-position,.al-robot-direction { transition:transform .3s ease; }
+.al-position { display:flex; flex-wrap:wrap; gap:10px; margin:14px 0; }
+.al-position > div { flex:1 1 120px; padding:9px; border:1px solid #36536c; border-radius:8px; }
+.al-position dt { color:#9eb6cc; font-size:.75rem; }
+.al-position dd { margin:4px 0 0; color:#c4f5fc; font:700 .85rem var(--mono); }
+.al-playback { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.al-playback .hw-button { min-height:44px; padding-inline:8px; }
+.al-status { min-height:76px; line-height:1.6; }
+.al-command-picker { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.al-command-picker .hw-button { display:flex; align-items:start; flex-direction:column; padding:12px; text-align:left; min-height:72px; min-width:0; }
+.al-command-picker small { font-size:.67rem; color:#b6cbdf; white-space:normal; overflow-wrap:anywhere; }
+.al-command-count { font: .8rem var(--mono); color:#b1cadc; }
+.al-command-list { list-style:none; padding:0; margin:12px 0; display:grid; gap:7px; max-height:460px; overflow:auto; }
+.al-command-list li { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:6px; border:1px solid #3b526b; border-radius:8px; background:#0e1e32; padding:7px; }
+.al-command-list [data-state='done'] { border-color:#41848f; }
+.al-command-list [data-state='current'] { border-color:#68e4ef; background:#153b4b; }
+.al-command-list [data-state='blocked'] { border-color:#f6b578; background:#493226; }
+.al-command-name { font-size:.84rem; }
+.al-command-actions { display:flex; gap:4px; }
+.al-command-actions button { width:44px; min-height:44px; padding:4px; border:1px solid #54718b; border-radius:6px; color:#d9f7ff; background:#193148; font:700 1rem var(--mono); cursor:pointer; }
+.al-command-actions button:disabled { opacity:.4; cursor:default; }
+.al-hint { margin-top:16px; border:1px solid #3b526b; border-radius:8px; padding:12px; }
+.al-hint summary { min-height:28px; cursor:pointer; color:#b0edf5; }
+.al-code-notes { line-height:1.65; }
+.al-code-notes li { padding:8px 4px; border-bottom:1px solid #2d425b; }
+.al-code-notes code { display:block; white-space:pre-wrap; overflow-wrap:anywhere; }
+.al-code-notes p { margin:4px 0 0; }
+@media(max-width:850px) { .al-lab-grid { grid-template-columns:minmax(0,1fr); } .al-field { max-width:520px; margin:auto; } }
+@media(prefers-reduced-motion:reduce) { .al-robot-position,.al-robot-direction { transition:none; } }
