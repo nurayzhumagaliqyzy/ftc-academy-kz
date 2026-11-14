@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react'
-import { motorOutput, normalizePower } from './motorModel'
-import type { MotorDirection } from './motorModel'
+import { checkMotorUnderstanding, motorChecks, motorOutput, motorPredictions, normalizePower } from './motorModel'
+import type { MotorCheckId, MotorDirection } from './motorModel'
 
-export function MotorLab({ done, onComplete }: { done: boolean; onComplete: () => void }) {
+export function MotorLab({ checks, onCheck, onRetry }: { checks: readonly MotorCheckId[]; onCheck: (id: MotorCheckId) => void; onRetry: () => void }) {
+  const done = motorChecks.every(check => checks.includes(check.id))
+  const task = motorChecks.find(check => !checks.includes(check.id))
+  const [prediction, setPrediction] = useState('')
+  const [assessmentFeedback, setAssessmentFeedback] = useState<{ correct: boolean; explanation: string } | null>(null)
   const [power, setPower] = useState(0.5)
   const [direction, setDirection] = useState<MotorDirection>('FORWARD')
   const [running, setRunning] = useState(false)
-  const [hasRun, setHasRun] = useState(false)
   const [notice, setNotice] = useState('Қуатты таңда да, «Іске қосу» батырмасын бас.')
   const output = motorOutput(power, direction, running)
   const rotating = output.rotation !== 'stopped'
@@ -25,7 +28,7 @@ export function MotorLab({ done, onComplete }: { done: boolean; onComplete: () =
   }, [])
 
   return <section className="hw-panel" aria-labelledby="ml-lab">
-    <div className="hw-section-head"><div><p className="hw-kicker">MOTOR CONTROL LAB / ОҚУ СҰЛБАСЫ</p><h2 id="ml-lab" tabIndex={-1}>Виртуалды DC Motor</h2></div><span className="hw-count">{done ? '✓ Орындалды' : 'Іске қос → тоқтат'}</span></div>
+    <div className="hw-section-head"><div><p className="hw-kicker">MOTOR CONTROL LAB / ОҚУ СҰЛБАСЫ</p><h2 id="ml-lab" tabIndex={-1}>Виртуалды DC Motor</h2></div><span className="hw-count">{done ? '✓ Орындалды' : `${checks.length}/3 тексеру`}</span></div>
     <p>Қуат таңбасы мен бағыттың байланысын зертте. Бұл — білім беруге арналған көрнекілік, нақты FTC моторының физикалық симуляторы емес.</p>
     <div className="ml-lab-grid">
       <div className="ml-motor-stage" data-sign={output.appliedPower === 0 ? 'zero' : output.appliedPower > 0 ? 'positive' : 'negative'}>
@@ -73,11 +76,10 @@ export function MotorLab({ done, onComplete }: { done: boolean; onComplete: () =
         </fieldset>
         <div className="hw-actions">
           <button className="hw-button" type="button" disabled={running || power === 0} onClick={() => {
-            setRunning(true); setHasRun(true); setNotice('Оқу анимациясы іске қосылды. Тоқтату батырмасын сына.')
+            setRunning(true); setNotice('Оқу анимациясы іске қосылды. Қуат таңбасы мен бапталған бағытты салыстыр.')
           }}>Іске қосу</button>
           <button className="hw-button hw-button-secondary ml-stop" type="button" onClick={() => {
             setRunning(false); setPower(0)
-            if (hasRun) { onComplete(); setHasRun(false) }
             setNotice('Тоқтатылды: motor.setPower(0). Қайта іске қосу үшін нөлден өзге қуатты таңда.')
           }}>Тоқтату · setPower(0)</button>
         </div>
@@ -87,6 +89,24 @@ export function MotorLab({ done, onComplete }: { done: boolean; onComplete: () =
       </div>
     </div>
     <p className="hw-note">Анимацияның айналу қарқыны шартты әрі тұрақты; ол RPM (минуттағы айналым саны) көрсетпейді. Нақты жылдамдық мотор түріне, жүктемеге, батарея кернеуіне және басқа жағдайларға тәуелді. Stop басқанда бұл көрнекілік бірден тоқтайды; нақты білік инерциямен қозғала алады.</p>
+    <div className="hw-detail ml-understanding" aria-labelledby="ml-understanding">
+      <h3 id="ml-understanding" tabIndex={-1}>Түсінгеніңді көрсет · {checks.length}/3</h3>
+      <p>Іске қосу мен тоқтату ғана жеткіліксіз. Үш қысқа жағдайда баптауды орындап, нәтижені түсіндір.</p>
+      {task ? <>
+        <h4>{task.title}</h4><p id="ml-task-instruction">{task.instruction}</p>
+        <label className="pl-match-label" htmlFor="ml-prediction">Нәтижені таңда</label>
+        <select id="ml-prediction" aria-describedby="ml-task-instruction" value={prediction} onChange={event => setPrediction(event.target.value)}>
+          <option value="">Нәтижені таңда…</option>{motorPredictions.map(option => <option key={option.id} value={option.id}>{option.label}</option>)}
+        </select>
+        <button className="hw-button" type="button" disabled={!prediction} onClick={() => {
+          const result = checkMotorUnderstanding(task.id, power, direction, running, prediction)
+          setAssessmentFeedback(result)
+          if (result.correct) { onCheck(task.id); setPrediction(''); document.getElementById('ml-understanding')?.focus({ preventScroll: true }) }
+        }}>Нәтижені тексеру</button>
+      </> : <p className="hw-success">✓ Оң, теріс және нөлдік қуатты, FORWARD/REVERSE әсерін дұрыс түсіндірдің.</p>}
+      <div aria-live="polite" aria-atomic="true">{assessmentFeedback && <div className="hw-feedback" data-kind={assessmentFeedback.correct ? 'good' : 'bad'}><strong>{assessmentFeedback.correct ? '✓ Дұрыс!' : 'Қайта тексер.'}</strong><p>{assessmentFeedback.explanation}</p></div>}</div>
+      <button className="hw-button hw-button-secondary" type="button" disabled={checks.length === 0} onClick={() => { onRetry(); setPrediction(''); setAssessmentFeedback(null); setRunning(false); setPower(0) }}>Lab бағалауын қайта орындау</button>
+    </div>
     <p className="hw-muted">Байқап көр: FORWARD +0.5 → FORWARD −0.5 → REVERSE −0.5 → нөл. Қай жағдайда бағыт бірдей болады?</p>
   </section>
 }

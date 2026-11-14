@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { afterEach, test } from 'node:test'
 import {
-  advanceExecution, atTarget, autonomousCodeScore, autonomousCodeTasks, autonomousProgressPercent,
+  autonomousScenario, advanceExecution, atTarget, autonomousCodeScore, autonomousCodeTasks, autonomousProgressPercent,
   autonomousQuestions, autonomousQuizPassed, autonomousQuizScore, autonomousReadings, autonomousStorageKey,
   canCompleteAutonomous, challenges, gridSize, initialExecution, loadAutonomousProgress,
   normalizeAutonomousProgress, saveAutonomousProgress,
@@ -27,7 +27,7 @@ function run(challenge, commands) {
   return state
 }
 function readyProgress() {
-  return normalizeAutonomousProgress({ read: autonomousReadings.map(section => section.id), solved: challenges.map(challenge => challenge.id),
+  return normalizeAutonomousProgress({ assessmentVersion: 2, scenarioAnswer: autonomousScenario.answer, read: autonomousReadings.map(section => section.id), solved: challenges.map(challenge => challenge.id),
     code: Object.fromEntries(autonomousCodeTasks.map(task => [task.id, task.answer])),
     answers: Object.fromEntries(autonomousQuestions.map(question => [question.id, question.answer])),
   })
@@ -131,7 +131,7 @@ test('completion needs four readings, three challenges, six code answers, quiz a
   const ready = readyProgress()
   assert.equal(autonomousCodeScore(ready), 6)
   assert.equal(canCompleteAutonomous(ready), true)
-  assert.equal(autonomousProgressPercent(ready), 90)
+  assert.equal(autonomousProgressPercent(ready), 91)
   assert.equal(autonomousProgressPercent({ ...ready, completed: true }), 100)
   for (const change of [{ read: [] }, { solved: ['straight', 'corner'] }, { code: {} }, { answers: {} }]) {
     const progress = normalizeAutonomousProgress({ ...ready, ...change, completed: true })
@@ -140,7 +140,7 @@ test('completion needs four readings, three challenges, six code answers, quiz a
   }
 })
 test('invalid storage values and forged completion are normalized without duplicate milestones', () => {
-  assert.deepEqual(normalizeAutonomousProgress({ read: ['mode', 'mode', 'bad'], solved: ['corner', 'corner', 'bad'], code: { annotation: 'Autonomous', stop: 'bad' }, answers: { mode: 4, start: '1', stop: 0.5, time: 2 }, completed: true }), { read: ['mode'], solved: ['corner'], code: { annotation: 'Autonomous' }, answers: { time: 2 }, completed: false })
+  assert.deepEqual(normalizeAutonomousProgress({ read: ['mode', 'mode', 'bad'], solved: ['corner', 'corner', 'bad'], code: { annotation: 'Autonomous', stop: 'bad' }, answers: { mode: 4, start: '1', stop: 0.5, time: 2 }, completed: true }), { assessmentVersion: 2, previouslyCompleted: false, read: ['mode'], solved: ['corner'], code: { annotation: 'Autonomous' }, answers: { time: 2 }, completed: false })
   for (const value of [null, [], 'bad', 42, { completed: true }]) assert.equal(autonomousProgressPercent(normalizeAutonomousProgress(value)), 0)
 })
 test('lesson four round-trip and quiz retry leave all earlier lesson and Hardware data untouched', () => {

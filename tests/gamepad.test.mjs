@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { afterEach, test } from 'node:test'
 import {
-  canCompleteGamepad, gamepadCodeScore, gamepadCodeTasks, gamepadOutput, gamepadProgressPercent,
+  gamepadScenario, canCompleteGamepad, gamepadCodeScore, gamepadCodeTasks, gamepadOutput, gamepadProgressPercent,
   gamepadQuestions, gamepadQuizPassed, gamepadQuizScore, gamepadReadings, gamepadStorageKey,
   joystickFromPointer, loadGamepadProgress, normalizeGamepadProgress, normalizeJoystick, saveGamepadProgress,
 } from '../src/programming/gamepadModel.ts'
@@ -15,7 +15,7 @@ afterEach(() => {
   else delete globalThis.localStorage
 })
 function readyProgress() {
-  return normalizeGamepadProgress({ read: gamepadReadings.map(section => section.id), labDone: true,
+  return normalizeGamepadProgress({ assessmentVersion: 2, scenarioAnswer: gamepadScenario.answer, read: gamepadReadings.map(section => section.id), labDone: true,
     code: Object.fromEntries(gamepadCodeTasks.map(task => [task.id, task.answer])),
     answers: Object.fromEntries(gamepadQuestions.map(question => [question.id, question.answer])),
   })
@@ -68,7 +68,7 @@ test('completion requires reading, lab, code, quiz, then an explicit completion 
   const ready = readyProgress()
   assert.equal(gamepadCodeScore(ready), 5)
   assert.equal(canCompleteGamepad(ready), true)
-  assert.equal(gamepadProgressPercent(ready), 88)
+  assert.equal(gamepadProgressPercent(ready), 89)
   assert.equal(gamepadProgressPercent({ ...ready, completed: true }), 100)
   for (const change of [{ read: [] }, { labDone: false }, { code: {} }, { answers: {} }]) {
     const progress = normalizeGamepadProgress({ ...ready, ...change, completed: true })
@@ -77,7 +77,7 @@ test('completion requires reading, lab, code, quiz, then an explicit completion 
   }
 })
 test('corrupt progress filters duplicates, unknown ids, invalid choices and forged completion', () => {
-  assert.deepEqual(normalizeGamepadProgress({ read: ['controller', 'controller', 'bad'], code: { read: 'gamepad1.left_stick_y', power: 'bad' }, answers: { purpose: 9, mode: -1, sign: 1.5, motor: '0' }, labDone: 'true', completed: true }), { read: ['controller'], code: { read: 'gamepad1.left_stick_y' }, answers: {}, labDone: false, completed: false })
+  assert.deepEqual(normalizeGamepadProgress({ read: ['controller', 'controller', 'bad'], code: { read: 'gamepad1.left_stick_y', power: 'bad' }, answers: { purpose: 9, mode: -1, sign: 1.5, motor: '0' }, labDone: 'true', completed: true }), { assessmentVersion: 2, previouslyCompleted: false, read: ['controller'], code: { read: 'gamepad1.left_stick_y' }, answers: {}, labDone: false, completed: false })
   for (const value of [null, [], 'bad', 42, { completed: true }]) assert.equal(gamepadProgressPercent(normalizeGamepadProgress(value)), 0)
 })
 test('lesson three persistence and retry preserve both previous lessons and Hardware data', () => {

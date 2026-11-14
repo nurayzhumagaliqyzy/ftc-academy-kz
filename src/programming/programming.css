@@ -50,3 +50,10 @@
 @media (max-width: 720px) { .pl-lesson-grid { grid-template-columns: minmax(0, 1fr); } }
 
 .pl-exercise-code { max-width:100%; overflow:auto; padding:16px; background:#071321; border:1px solid #2e506a; border-radius:12px; color:#a7e8f1; font-size:13px; }
+
+.pl-outcome { padding:12px; border-left:3px solid var(--cyan); background:#112c3c; }
+.pl-scenario .hw-question { margin-top:18px; }
+.pl-scenario .hw-feedback { margin-bottom:18px; }
+.programming-lesson .ml-understanding { margin-top:20px; }
+.ml-understanding select { display:block; width:100%; min-height:48px; margin:10px 0; padding:10px; border:1px solid #6687a1; border-radius:8px; color:#eff7ff; background:#14263c; font:inherit; }
+.ml-understanding .hw-button { margin:8px 8px 0 0; }

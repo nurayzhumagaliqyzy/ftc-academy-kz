@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { LessonNavigation, LessonQuiz, ReadingSection } from './LessonComponents'
+import { LessonScenario, PreviousCompletionNotice, LessonNavigation, LessonQuiz, ReadingSection } from './LessonComponents'
 import { MotorLab } from './MotorLab'
 import {
-  canCompleteMotor, codeTasks, loadMotorProgress, motorCodeScore, motorJavaExample, motorProgressPercent,
-  motorQuestions, motorQuizPassed, motorQuizScore, motorReadings, normalizeMotorProgress, saveMotorProgress,
+  motorScenario, canCompleteMotor, codeTasks, loadMotorProgress, motorCodeScore, motorJavaExample, motorProgressPercent,
+  motorLabPassed, motorQuestions, motorQuizPassed, motorQuizScore, motorReadings, normalizeMotorProgress, saveMotorProgress,
 } from './motorModel'
 import type { MotorProgress, MotorReadingId } from './motorModel'
 import './motor.css'
@@ -77,11 +77,12 @@ export function MotorLesson() {
     <section className="hw-panel pl-progress" aria-labelledby="ml-progress">
       <div className="hw-section-head"><h2 id="ml-progress">Сабақтағы прогресс</h2><span className="hw-count">{percent}% · {progress.completed ? 'Аяқталды' : 'Оқу барысында'}</span></div>
       <progress className="hw-meter" max={100} value={percent} aria-label="Екінші сабақтағы прогресс">{percent}%</progress>
-      <p>Теория: {progress.read.length}/4 · Lab: {progress.labDone ? 'орындалды' : 'әлі орындалмады'} · Java: {motorCodeScore(progress)}/5 · Тест: {motorQuizScore(progress)}/5</p>
-      <p className="hw-muted" role="status">{storageAvailable ? 'Прогресс осы браузерде сақталады. Бірінші сабақтың нәтижелері бөлек сақталады.' : 'Браузерде сақтау қолжетімсіз. Бетті жапқанда осы сабақтағы жаңа прогресс жоғалады.'}</p>
+      <p>Теория: {progress.read.length}/4 · Lab: {progress.labChecks.length}/3 · Java: {motorCodeScore(progress)}/5 · Тест: {motorQuizScore(progress)}/5 · Жағдаят: {progress.scenarioAnswer === motorScenario.answer ? 'орындалды' : 'әлі орындалмады'}</p>
+      <PreviousCompletionNotice show={progress.previouslyCompleted && !progress.completed} />
+        <p className="hw-muted" role="status">{storageAvailable ? 'Прогресс осы браузерде сақталады. Бірінші сабақтың нәтижелері бөлек сақталады.' : 'Браузерде сақтау қолжетімсіз. Бетті жапқанда осы сабақтағы жаңа прогресс жоғалады.'}</p>
     </section>
     <nav className="pl-jumps" aria-label="Екінші сабақ бөлімдері">
-      {[['motor', 'Теория'], ['lab', 'Motor Control Lab'], ['code-exercise', 'Java тапсырмасы'], ['example', 'Толық Java мысалы'], ['quiz', 'Тест'], ['completion', 'Аяқтау']].map(([id, label]) =>
+      {[['motor', 'Теория'], ['lab', 'Motor Control Lab'], ['code-exercise', 'Java тапсырмасы'], ['example', 'Толық Java мысалы'], ['quiz', 'Тест'], ['scenario', 'Жағдаят'], ['completion', 'Аяқтау']].map(([id, label]) =>
         <button className="hw-button hw-button-secondary" key={id} type="button" onClick={() => jumpTo(id)}>{label}</button>)}
     </nav>
     <section className="hw-panel" aria-labelledby="ml-objectives">
@@ -92,6 +93,7 @@ export function MotorLesson() {
         <li>FTC SDK (бағдарламалық әзірлеу жинағы) ішіндегі <code>DcMotor</code>, <code>hardwareMap.get()</code>, <code>setPower()</code> және <code>setDirection()</code> қолданылуын танисың.</li>
         <li>Моторды іске қосу мен тоқтату кодын оқып, жиі кездесетін қателерді табасың.</li>
       </ul>
+      <p className="pl-outcome"><b>Күтілетін нәтиже:</b> Қуаттың таңбасы мен FORWARD/REVERSE баптауын бірге қолданып, негізгі бағытты және нөлдік қуатты дұрыс анықтайсың.</p>
       <p className="pl-prerequisite">Дайындық: <a className="hw-back" href="#programming/sdk-opmode">1-сабақтағы LinearOpMode, waitForStart() және opModeIsActive() ұғымдарын қайтала →</a></p>
     </section>
     <ReadingSection {...readingProps('motor')}>
@@ -103,7 +105,7 @@ export function MotorLesson() {
       <ol className="hw-list">
         <li>Нақты құрылғының қорегін өшір. Моторды қозғалмайтын тірекке бекіт; айналатын бөлікке қол тигізбе.</li>
         <li>Мотордың екі сымды қорек кабелін Control Hub-тағы <b>Motor 0</b> портына тиісті кабельмен қос. Hub-та Motor порттары 0–3 деп нөмірленген. Servo не Encoder порты мотор қорегін алмастырмайды.</li>
-        <li>Driver Station (оператордың басқару қолданбасы) конфигурациясында Motor 0 үшін мотордың дұрыс түрін таңда, атауын <code>motor</code> деп беріп, конфигурацияны сақтап іске қос.</li>
+        <li>Driver Station (оператор станциясы) конфигурациясында Motor 0 үшін мотордың дұрыс түрін таңда, атауын <code>motor</code> деп беріп, конфигурацияны сақтап іске қос.</li>
         <li>Кодтағы <code>"motor"</code> атауы конфигурациядағы атаумен дәл сәйкес келсін. Порт нөмірі мен құрылғы атауы — екі бөлек ұғым.</li>
       </ol>
       <p>Encoder (айналымды өлшейтін құрылғы) кабелі — бөлек сигнал қосылымы. Бұл сабақтағы <code>RUN_WITHOUT_ENCODER</code> режимі айналым кері байланысын қолданбайды; моторды қуатпен басқару үшін Encoder дерегі қажет емес.</p>
@@ -140,7 +142,9 @@ export function MotorLesson() {
         <li>START-ты күтпеу немесе шексіз <code>while (true)</code> қолдану → іске қосу және STOP (тоқтату) пәрмендерін ескер.</li>
       </ul>
     </ReadingSection>
-    <MotorLab done={progress.labDone} onComplete={() => update(previous => ({ ...previous, labDone: true }))} />
+    <MotorLab checks={progress.labChecks}
+      onCheck={id => update(previous => ({ ...previous, labChecks: previous.labChecks.includes(id) ? previous.labChecks : [...previous.labChecks, id] }))}
+      onRetry={() => update(previous => ({ ...previous, labChecks: [], completed: false }))} />
     <MotorCodeExercise answers={progress.code} onChange={(id, value) => update(previous => ({ ...previous, code: { ...previous.code, [id]: value } }))} />
     <section className="hw-panel" aria-labelledby="ml-example">
       <p className="hw-kicker">БІРІНШІ САБАҚТАН ЖАЛҒАСТЫРАМЫЗ</p><h2 id="ml-example" tabIndex={-1}>Толық LinearOpMode мысалы</h2>
@@ -157,17 +161,22 @@ export function MotorLesson() {
     <LessonQuiz id="ml-quiz" questions={motorQuestions} answers={progress.answers}
       onAnswer={(id, answer) => update(previous => previous.answers[id] !== undefined ? previous : { ...previous, answers: { ...previous.answers, [id]: answer } })}
       onRetry={() => update(previous => ({ ...previous, answers: {}, completed: false }))}
-      retryNote="Қайта бастағанда тест жауаптары мен аяқталу белгісі жаңартылады. Теория, Lab және Java тапсырмасы сақталады." />
+      retryNote="Қайта бастағанда тест жауаптары мен аяқталу белгісі жаңартылады. Теория, Lab, Java тапсырмасы және жағдаят сақталады." />
+    <LessonScenario id="ml-scenario" question={motorScenario} answer={progress.scenarioAnswer}
+      onAnswer={answer => update(previous => previous.scenarioAnswer !== undefined ? previous : { ...previous, scenarioAnswer: answer })}
+      onRetry={() => update(previous => ({ ...previous, scenarioAnswer: undefined, completed: false }))} />
+
     <section className="hw-panel" aria-labelledby="ml-completion">
       <h2 id="ml-completion" tabIndex={-1}>Сабақты аяқтау</h2>
       <ul className="pl-checklist">
         <li>{progress.read.length === 4 ? '✓' : '○'} Теорияны оқылған деп белгілеу ({progress.read.length}/4)</li>
-        <li>{progress.labDone ? '✓' : '○'} Lab-та нөлден өзге қуатпен іске қосып, «Тоқтату» батырмасын басу</li>
+        <li>{motorLabPassed(progress) ? '✓' : '○'} Lab-та үш жағдайды дұрыс орындау ({progress.labChecks.length}/3)</li>
         <li>{motorCodeScore(progress) === 5 ? '✓' : '○'} Java тапсырмасы ({motorCodeScore(progress)}/5 дұрыс)</li>
         <li>{motorQuizPassed(progress) ? '✓' : '○'} Барлық бес сұраққа жауап беру және кемінде 4/5 жинау ({answered}/5 жауап, {motorQuizScore(progress)}/5 дұрыс)</li>
-      </ul>
+        <li>{progress.scenarioAnswer === motorScenario.answer ? '✓' : '○'} Қолданбалы жағдаятты дұрыс орындау</li>
+        </ul>
       <button className="hw-button" type="button" disabled={!ready || progress.completed} aria-describedby="ml-completion-help" onClick={() => update(previous => ({ ...previous, completed: true }))}>{progress.completed ? '✓ Сабақ аяқталды' : 'Сабақты аяқтадым'}</button>
-      <p id="ml-completion-help" className={progress.completed ? 'hw-success' : 'hw-muted'} role="status">{progress.completed ? 'Жарайсың! Сабақ аяқталды. Оған кез келген уақытта қайта орала аласың.' : ready ? 'Барлық шарт орындалды. Аяқтау батырмасын бас.' : 'Аяқтау батырмасы жоғарыдағы төрт шарт орындалғанда ашылады.'}</p>
+      <p id="ml-completion-help" className={progress.completed ? 'hw-success' : 'hw-muted'} role="status">{progress.completed ? 'Жарайсың! Сабақ аяқталды. Оған кез келген уақытта қайта орала аласың.' : ready ? 'Барлық шарт орындалды. Аяқтау батырмасын бас.' : 'Аяқтау батырмасы жоғарыдағы бес шарт орындалғанда ашылады.'}</p>
     </section>
     <LessonNavigation current="dc-motor" pager />
     <aside className="hw-panel hw-sources" aria-labelledby="ml-sources"><h2 id="ml-sources">Ресми дереккөздер</h2><p className="hw-muted">FIRST Tech Challenge құжаттамасы және FTC SDK API · тексерілген күні: 11.11.2026. Сілтемелер English тілінде, жаңа бетте ашылады.</p>

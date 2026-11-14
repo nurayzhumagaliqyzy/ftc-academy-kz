@@ -108,3 +108,28 @@ export function LessonCodeExercise({ id, tasks, answers, onChange, title = 'Tele
     <p className="hw-muted">Бұл — жеке үзінділер. Толық бағдарламаның реті төменде берілген.</p>
   </section>
 }
+
+
+export function PreviousCompletionNotice({ show }: { show: boolean }) {
+  return show ? <p className="hw-note" role="status">Бұрынғы нұсқадағы аяқтау белгісі сақталды. Оқу белгілері мен жауаптарың жоғалған жоқ. Осы сабақтың жаңартылған аяқтау шарттарын төменнен тексер.</p> : null
+}
+
+export function LessonScenario({ id, question, answer, onAnswer, onRetry }: {
+  id: string; question: Omit<QuizQuestion, 'id'>; answer: number | undefined
+  onAnswer: (answer: number) => void; onRetry: () => void
+}) {
+  const answered = answer !== undefined
+  const correct = answer === question.answer
+  return <section className="hw-panel pl-scenario" aria-labelledby={id}>
+    <div className="hw-section-head"><div><p className="hw-kicker">ҚОЛДАНУ / ЖАҒДАЯТ</p><h2 id={id} tabIndex={-1}>Біліміңді қолдан</h2></div><span className="hw-count">{correct ? '✓ Орындалды' : '1 қолданбалы сұрақ'}</span></div>
+    <p>Жағдаятты оқып, дұрыс шешімді таңда. Бұл сұрақ бес сұрақтық тесттен бөлек бағаланады; сабақты аяқтау үшін оны дұрыс орындау керек.</p>
+    <fieldset className="hw-question pl-question"><legend>{question.prompt}</legend><div className="hw-options">
+      {question.options.map((option, index) => <button type="button" className="hw-option" key={option} disabled={answered} aria-pressed={answer === index}
+        data-result={answered && index === question.answer ? 'correct' : answer === index ? 'wrong' : undefined} onClick={() => onAnswer(index)}>
+        {option}{answered && index === question.answer && <small>✓ Дұрыс жауап</small>}
+      </button>)}
+    </div></fieldset>
+    <div aria-live="polite" aria-atomic="true">{answered && <div className="hw-feedback" data-kind={correct ? 'good' : 'bad'}><strong>{correct ? '✓ Дұрыс шешім!' : 'Бұл шешім сәйкес емес. Себебін оқып, қайта орында.'}</strong><p>{question.explanation}</p></div>}</div>
+    <button type="button" className="hw-button hw-button-secondary" disabled={!answered} onClick={() => { onRetry(); document.getElementById(id)?.focus({ preventScroll: true }) }}>Жағдаятты қайта орындау</button>
+  </section>
+}
