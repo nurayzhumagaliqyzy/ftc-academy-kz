@@ -4,7 +4,7 @@ import mark from './assets/mark.svg'
 import robot from './assets/robot.svg'
 import { HardwareModule, hardwareSectionFor } from './hardware/HardwareModule'
 import { ProgrammingModule } from './programming/ProgrammingModule'
-import { programmingSectionFor } from './programming/routes'
+import { programmingLessons, programmingSectionFor } from './programming/routes'
 
 const iconPaths = {
   home: 'M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
@@ -52,7 +52,7 @@ const courses: Course[] = [
     label: 'Бағдарламалау',
     icon: 'code',
     description: 'FTC SDK (бағдарламалық әзірлеу жинағы) ортасымен танысып, Java тілінде TeleOp (оператор басқаратын режим) және Autonomous (автономды режим) бағдарламаларын жазуды үйрен.',
-    topics: ['1-сабақ: FTC SDK және OpMode (роботты басқару бағдарламасы)', '2-сабақ: DC Motor (тұрақты ток қозғалтқышы) басқару'],
+    topics: programmingLessons.map((lesson, index) => `${index + 1}-сабақ: ${lesson.title}`),
   },
   {
     id: 'simulator',
