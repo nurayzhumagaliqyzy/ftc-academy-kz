@@ -26,10 +26,10 @@ function ready() {
 function mockStorage(values) {
   Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: { getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) } })
 }
-test('all six lesson routes resolve; previous hashes are stable and lessons 7/8 remain absent', () => {
-  assert.deepEqual(programmingLessons.map(item => programmingSectionFor(item.hash)), ['sdk-opmode', 'dc-motor', 'gamepad-teleop', 'autonomous', 'servo', 'sensors'])
-  assert.equal(new Set(programmingLessons.map(item => item.hash)).size, 6)
-  for (const slug of ['encoder', 'integrated-challenge', '7', '8', 'sensors/other']) assert.equal(programmingSectionFor('programming/' + slug), undefined)
+test('first six lesson routes remain stable and final-project routes remain absent', () => {
+  assert.deepEqual(programmingLessons.slice(0, 6).map(item => programmingSectionFor(item.hash)), ['sdk-opmode', 'dc-motor', 'gamepad-teleop', 'autonomous', 'servo', 'sensors'])
+  assert.equal(new Set(programmingLessons.map(item => item.hash)).size, programmingLessons.length)
+  for (const slug of ['integrated-challenge', '7', '8', 'sensors/other']) assert.equal(programmingSectionFor('programming/' + slug), undefined)
 })
 test('valid distance below/equal/above threshold selects 0/0/0.3, without rounding raw measurements', () => {
   for (const [distance, threshold, power] of [[15,20,0],[20,20,0],[20.000001,20,.3],[19.999999,20,0],[35,20,.3],[0,20,0],[-5,20,0],[1000,20,.3],[5,5,0],[100,50,.3]]) {
