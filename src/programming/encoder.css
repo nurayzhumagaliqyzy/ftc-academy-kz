@@ -1,0 +1,21 @@
+.en-lab-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 1.25rem; margin: 1.5rem 0; align-items: start; }
+.en-visual { min-width: 0; padding: .8rem; border: 1px solid #2e506a; border-radius: 1rem; background: #071b2b; }
+.en-visual svg { display: block; width: 100%; height: auto; max-width: 460px; margin: auto; }
+.en-visual text { fill: #c2e6ef; font: 12px sans-serif; }
+.en-motor { fill: #12344a; stroke: #42dce6; stroke-width: 2; }
+.en-shaft { stroke: #729ab1; stroke-width: 16; }
+.en-disc { fill: #0b2334; stroke: #3e7c95; stroke-width: 3; }
+.en-marker path { stroke: #4ce1e5; stroke-width: 5; }
+.en-marker circle, .en-center { fill: #4ce1e5; }
+.en-values { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+.en-values div { border: 1px solid #2e506a; border-radius: 8px; padding: .7rem; }
+.en-values dt { font-size: .8rem; color: #b3cbdc; }
+.en-values dd { margin: .4rem 0 0; color: #50e3e7; font-weight: 700; font-variant-numeric: tabular-nums; }
+.en-controls, .en-task { min-width: 0; }
+.en-controls input, .en-task input, .en-task select { display: block; box-sizing: border-box; width: 100%; min-height: 48px; margin: .6rem 0 1rem; padding: 10px 12px; border: 1px solid #6687a1; border-radius: 8px; background: #14263c; color: #eff7ff; font: inherit; font-size: .9rem; }
+.en-buttons, .en-challenges { display: flex; flex-wrap: wrap; gap: .7rem; margin: 1.25rem 0; }
+.en-challenges [aria-pressed=true] { border-color: #4ce1e5; background: #123d4d; }
+.en-task { margin-bottom: 1.25rem; }
+.en-task .pl-match-label { margin-top: 1rem; }
+@media (max-width: 900px) { .en-lab-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 620px) { .en-challenges .hw-button, .en-buttons .hw-button { flex: 1 1 100%; } }
