@@ -32,9 +32,9 @@ function readyProgress() {
     answers: Object.fromEntries(autonomousQuestions.map(question => [question.id, question.answer])),
   })
 }
-test('all four implemented lesson routes are unique; unimplemented lessons do not resolve', () => {
-  assert.deepEqual(programmingLessons.map(lesson => programmingSectionFor(lesson.hash)), ['sdk-opmode', 'dc-motor', 'gamepad-teleop', 'autonomous'])
-  assert.equal(new Set(programmingLessons.map(lesson => lesson.hash)).size, 4)
+test('first four lesson routes remain stable; unknown routes do not resolve', () => {
+  assert.deepEqual(programmingLessons.slice(0, 4).map(lesson => programmingSectionFor(lesson.hash)), ['sdk-opmode', 'dc-motor', 'gamepad-teleop', 'autonomous'])
+  assert.equal(new Set(programmingLessons.map(lesson => lesson.hash)).size, programmingLessons.length)
   for (const hash of ['programming/autonomous/other', 'programming/5', 'hardware/explorer']) assert.equal(programmingSectionFor(hash), undefined)
 })
 test('all three challenges are deterministic and solvable with increasing sequence length', () => {

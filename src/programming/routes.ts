@@ -3,6 +3,7 @@ export const programmingLessons = [
   { id: 'dc-motor', title: 'DC Motor басқару', hash: 'programming/dc-motor' },
   { id: 'gamepad-teleop', title: 'Gamepad және TeleOp', hash: 'programming/gamepad-teleop' },
   { id: 'autonomous', title: 'Autonomous негіздері', hash: 'programming/autonomous' },
+  { id: 'servo', title: 'Servo Motor басқару', hash: 'programming/servo' },
 ] as const
 
 export type LessonId = (typeof programmingLessons)[number]['id']
