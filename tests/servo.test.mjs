@@ -27,10 +27,10 @@ function storage(values) {
     getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value),
   } })
 }
-test('first five routes stay stable; future routes remain absent', () => {
+test('first five routes stay stable; unknown routes remain absent', () => {
   assert.deepEqual(programmingLessons.slice(0, 5).map(item => programmingSectionFor(item.hash)), ['sdk-opmode', 'dc-motor', 'gamepad-teleop', 'autonomous', 'servo'])
   assert.equal(new Set(programmingLessons.map(item => item.hash)).size, programmingLessons.length)
-  for (const route of ['sensor', 'integrated-challenge', 'servo/other']) assert.equal(programmingSectionFor('programming/' + route), undefined)
+  for (const route of ['sensor', 'servo/other']) assert.equal(programmingSectionFor('programming/' + route), undefined)
 })
 test('position clamps to 0..1, rounds to hundredths and handles invalid inputs safely', () => {
   for (const [input, expected] of [[-10, 0], [0, 0], [0.254, .25], [.256, .26], [1, 1], [10, 1]]) assert.equal(normalizeServoPosition(input), expected)

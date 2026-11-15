@@ -26,10 +26,10 @@ function ready() {
 function mockStorage(values) {
   Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: { getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) } })
 }
-test('first six lesson routes remain stable and final-project routes remain absent', () => {
+test('first six lesson routes remain stable and unknown routes remain absent', () => {
   assert.deepEqual(programmingLessons.slice(0, 6).map(item => programmingSectionFor(item.hash)), ['sdk-opmode', 'dc-motor', 'gamepad-teleop', 'autonomous', 'servo', 'sensors'])
   assert.equal(new Set(programmingLessons.map(item => item.hash)).size, programmingLessons.length)
-  for (const slug of ['integrated-challenge', '7', '8', 'sensors/other']) assert.equal(programmingSectionFor('programming/' + slug), undefined)
+  for (const slug of ['7', '8', 'sensors/other']) assert.equal(programmingSectionFor('programming/' + slug), undefined)
 })
 test('valid distance below/equal/above threshold selects 0/0/0.3, without rounding raw measurements', () => {
   for (const [distance, threshold, power] of [[15,20,0],[20,20,0],[20.000001,20,.3],[19.999999,20,0],[35,20,.3],[0,20,0],[-5,20,0],[1000,20,.3],[5,5,0],[100,50,.3]]) {

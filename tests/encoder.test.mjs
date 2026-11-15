@@ -26,10 +26,10 @@ function ready() {
   return normalizeEncoderProgress({ read:encoderReadings.map(x=>x.id), solved:encoderChallenges.map(x=>x.id), code:Object.fromEntries(encoderCodeTasks.map(x=>[x.id,x.answer])), answers:Object.fromEntries(encoderQuestions.map(x=>[x.id,x.answer])), scenarioAnswer:encoderScenario.answer })
 }
 function mockStorage(values) { Object.defineProperty(globalThis,'localStorage',{configurable:true,value:{getItem:key=>values.get(key)??null,setItem:(key,value)=>values.set(key,value)}}) }
-test('seven unique routes retain the first six hashes; final-project links remain absent',()=>{
-  assert.deepEqual(programmingLessons.map(x=>programmingSectionFor(x.hash)),['sdk-opmode','dc-motor','gamepad-teleop','autonomous','servo','sensors','encoder'])
-  assert.equal(new Set(programmingLessons.map(x=>x.hash)).size,7)
-  for(const hash of ['programming/8','programming/integrated-challenge','programming/encoder/other']) assert.equal(programmingSectionFor(hash),undefined)
+test('seven existing lesson hashes remain a stable prefix',()=>{
+  assert.deepEqual(programmingLessons.slice(0,7).map(x=>programmingSectionFor(x.hash)),['sdk-opmode','dc-motor','gamepad-teleop','autonomous','servo','sensors','encoder'])
+  assert.equal(new Set(programmingLessons.map(x=>x.hash)).size,programmingLessons.length)
+  for(const hash of ['programming/8','programming/encoder/other']) assert.equal(programmingSectionFor(hash),undefined)
 })
 test('tick inputs accept signed bounded integers; blanks, fractions and non-finite values are rejected',()=>{
   for(const [input,value] of [['+600',600],['-400',-400],[' -2000 ',-2000],[2000,2000],['0',0],[-0,0]]) assert.equal(parseTickInput(input),value)
