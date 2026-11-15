@@ -6,6 +6,7 @@ export const programmingLessons = [
   { id: 'servo', title: 'Servo Motor басқару', hash: 'programming/servo' },
   { id: 'sensors', title: 'Sensor және шартты операторлар', hash: 'programming/sensors' },
   { id: 'encoder', title: 'Encoder және нысаналы позицияға қозғалу', hash: 'programming/encoder' },
+  { id: 'integrated-challenge', title: 'FTC Integrated Challenge (қорытынды практикалық жоба)', hash: 'programming/integrated-challenge' },
 ] as const
 
 export type LessonId = (typeof programmingLessons)[number]['id']
