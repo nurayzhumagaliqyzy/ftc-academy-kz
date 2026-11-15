@@ -1,0 +1,25 @@
+.sn-lab-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 1.25rem; align-items: start; margin: 1.5rem 0; }
+.sn-visual { min-width: 0; border: 1px solid #2e506a; border-radius: 1rem; padding: .75rem; background: #071b2b; color: #46dce5; }
+.sn-visual svg { display: block; width: 100%; height: auto; }
+.sn-visual text { fill: #c2e6ef; font: 12px sans-serif; }
+.sn-robot { fill: #12344a; stroke: #42dce6; stroke-width: 2; }
+.sn-wheel { fill: #48637d; }
+.sn-sensor { fill: #4ce1e5; }
+.sn-ray { stroke: #4ce1e5; stroke-width: 3; }
+.sn-visual[data-state=invalid] .sn-ray { stroke: #f2bc6a; stroke-dasharray: 5 6; }
+.sn-obstacle { fill: #c7788d; stroke: #f8b0bf; stroke-width: 2; }
+.sn-threshold { stroke: #f2bc6a; stroke-width: 2; stroke-dasharray: 5 5; }
+.sn-command { display: grid; gap: .6rem; border-top: 1px solid #2e506a; padding: .9rem 0 0; }
+.sn-command span { font-size: .85rem; color: #c1d0e1; }
+.sn-controls { min-width: 0; }
+.sn-controls input[type=range] { width: 100%; min-height: 48px; accent-color: #4ce1e5; touch-action: pan-y; cursor: pointer; }
+.sn-controls input:disabled { opacity: .45; cursor: not-allowed; }
+.sn-invalid { display: flex; gap: .7rem; align-items: center; min-height: 48px; font-weight: 650; cursor: pointer; }
+.sn-invalid input { width: 22px; height: 22px; accent-color: #4ce1e5; flex: none; }
+.sn-challenges { display: flex; flex-wrap: wrap; gap: .7rem; margin: 1.25rem 0; }
+.sn-challenges [aria-pressed=true] { border-color: #4ce1e5; background: #123d4d; }
+.sn-task { min-width: 0; margin-bottom: 1.25rem; }
+.sn-task select { display: block; width: 100%; min-height: 48px; margin: .6rem 0 1rem; padding: 10px 12px; border: 1px solid #6687a1; border-radius: 8px; background: #14263c; color: #eff7ff; font: inherit; font-size: .9rem; text-overflow: ellipsis; }
+.sn-task .pl-match-label { margin-top: 1rem; }
+@media (max-width: 900px) { .sn-lab-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 620px) { .sn-challenges .hw-button { width: 100%; } .sn-task select { padding-inline: 7px; } }
