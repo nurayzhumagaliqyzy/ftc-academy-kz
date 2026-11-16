@@ -211,7 +211,7 @@ h1 em { display: block; color: var(--cyan); font-style: normal; }
 .hero-art img { width: min(116%, 650px); max-width: none; height: auto; }
 
 .courses { padding-top: 37px; }
-.section-heading { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 19px; }
+.section-heading { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 19px; }
 .section-kicker, .module-count, .card-index, .card-category { font: 650 10px/1.4 var(--mono); letter-spacing: .12em; }
 .section-kicker { margin-bottom: 7px; color: var(--cyan); }
 .section-heading h2 { margin-bottom: 5px; font-size: clamp(25px, 3vw, 36px); line-height: 1.15; letter-spacing: -.04em; }
@@ -295,11 +295,12 @@ details ul { margin: 0 0 5px; padding-inline-start: 18px; color: var(--muted); f
 details li + li { margin-top: 5px; }
 .coming-soon { color: #c1d4e0; }
 
-.main-footer { margin-top: 30px; padding: 17px 0 22px; border-top: 1px solid var(--line); gap: 10px; }
+.main-footer { flex-wrap: wrap; margin-top: 30px; padding: 17px 0 22px; border-top: 1px solid var(--line); gap: 10px; }
 
 @media (max-width: 1120px) {
   :root { --sidebar-width: 212px; }
   .content { padding-inline: 27px; }
+  .course-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 900px) {
