@@ -227,3 +227,9 @@
   .hw-wires li { gap: 4px; font-size: .72rem; }
   .hw-remove { padding-inline: 4px; font-size: .68rem; }
 }
+
+@media (max-width: 620px) {
+  .hw-tabs a, .hw-button, .hw-read-link, .hw-remove, .hw-lead, .hw-port { min-height: 44px; }
+  .hw-wires li { grid-template-columns: minmax(0, 1fr) minmax(20px, .4fr) minmax(0, .7fr); }
+  .hw-wires .hw-remove { grid-column: 1 / -1; justify-self: start; }
+}
