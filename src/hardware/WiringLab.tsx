@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { SourceLinks } from './Explorer'
 import { connectionError, getPort, leadIds, leads, portGroups } from './model'
 import type { Connections, LeadId } from './model'
@@ -8,11 +8,21 @@ type Feedback = { kind: 'good' | 'bad' | 'note'; text: string }
 export function WiringLab({ wiring, onChange }: { wiring: Connections; onChange: (wiring: Connections) => void }) {
   const [selected, setSelected] = useState<LeadId | null>(null)
   const [feedback, setFeedback] = useState<Feedback | null>(null)
+  const firstCableButton = useRef<HTMLButtonElement>(null)
+  const restoreCableFocus = useRef(false)
   const wired = leadIds.flatMap(lead => {
     const port = getPort(wiring[lead])
     return port ? [{ lead, port }] : []
   })
   const expansionComplete = Boolean(wiring['expansion-power'] && wiring['expansion-data'])
+
+  useLayoutEffect(() => {
+    if (wired.length === 0 && restoreCableFocus.current) {
+      restoreCableFocus.current = false
+      firstCableButton.current?.focus({ preventScroll: true })
+      firstCableButton.current?.scrollIntoView({ block: 'nearest', behavior: 'instant' })
+    }
+  }, [wired.length])
 
   function connect(id: string) {
     const port = getPort(id)
@@ -58,6 +68,7 @@ export function WiringLab({ wiring, onChange }: { wiring: Connections; onChange:
           <div className="hw-leads">
             {leadIds.map(id => (
               <button key={id} type="button" aria-pressed={selected === id} className="hw-lead"
+                ref={id === leadIds[0] ? firstCableButton : undefined}
                 onClick={() => {
                   setSelected(id)
                   setFeedback(null)
@@ -104,7 +115,9 @@ export function WiringLab({ wiring, onChange }: { wiring: Connections; onChange:
           <div><h3>Қосылымдар сұлбасы</h3>
             <p>Портты қайта таңдасаң, кабель жаңа орынға ауысады.</p></div>
           {wired.length > 0 && (
-            <button type="button" className="hw-button hw-button-secondary" onClick={() => {
+            <button type="button" className="hw-button hw-button-secondary" onClick={event => {
+              // Keyboard and assistive activation have no pointer click count.
+              restoreCableFocus.current = event.detail === 0
               onChange({})
               setFeedback({ kind: 'note', text: 'Барлық кабель ажыратылды.' })
             }}>Барлығын ажырату</button>
