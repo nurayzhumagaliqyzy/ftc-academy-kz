@@ -35,21 +35,21 @@ export function MotorLab({ checks, onCheck, onRetry }: { checks: readonly MotorC
         <div className="ml-stage-heading"><span>DC MOTOR / АЛДЫНАН КӨРІНІС</span><span className="ml-led" data-active={rotating} /></div>
         <div className="ml-motor-drawing" aria-hidden="true">
           <svg className="ml-motor-base" viewBox="0 0 320 300" fill="none">
-            <path d="M85 230v27h150v-27M104 255v11m112-11v11" stroke="#4d7189" strokeWidth="8" />
-            <rect x="48" y="55" width="224" height="186" rx="55" fill="#132b42" stroke="#427f96" strokeWidth="2" />
-            <circle cx="160" cy="148" r="83" fill="#0a1829" stroke="#4da5b9" strokeWidth="2" />
+            <path d="M85 230v27h150v-27M104 255v11m112-11v11" stroke="var(--diagram-stroke, #4d7189)" strokeWidth="8" />
+            <rect x="48" y="55" width="224" height="186" rx="55" fill="var(--diagram-surface, #132b42)" stroke="var(--diagram-stroke, #427f96)" strokeWidth="2" />
+            <circle cx="160" cy="148" r="83" fill="var(--diagram-surface, #0a1829)" stroke="var(--diagram-stroke, #4da5b9)" strokeWidth="2" />
             {[0, 60, 120, 180, 240, 300].map(angle => <g key={angle} transform={`rotate(${angle} 160 148)`}>
-              <rect x="151" y="72" width="18" height="12" rx="3" fill="#294d62" />
+              <rect x="151" y="72" width="18" height="12" rx="3" fill="var(--diagram-surface, #294d62)" />
             </g>)}
-            <path d="M55 194H32v76h66m169-76h21v76h-66" stroke="#60d8e8" strokeWidth="4" />
-            <rect x="100" y="253" width="120" height="35" rx="7" fill="#132c40" stroke="#42667e" />
-            <text x="160" y="275" fill="#a9d7e6" textAnchor="middle" fontSize="12" fontFamily="monospace">Motor 0</text>
+            <path d="M55 194H32v76h66m169-76h21v76h-66" stroke="var(--diagram-stroke, #60d8e8)" strokeWidth="4" />
+            <rect x="100" y="253" width="120" height="35" rx="7" fill="var(--diagram-surface, #132c40)" stroke="var(--diagram-stroke, #42667e)" />
+            <text x="160" y="275" fill="var(--diagram-text, #a9d7e6)" textAnchor="middle" fontSize="12" fontFamily="monospace">Motor 0</text>
           </svg>
           <svg className="ml-rotor" viewBox="0 0 320 300" fill="none" style={{ animationPlayState: rotating ? 'running' : 'paused', animationDirection: output.rotation === 'counterclockwise' ? 'reverse' : 'normal' }}>
-            <circle cx="160" cy="148" r="52" fill="#16374b" stroke="#63e4f4" strokeWidth="2" />
-            {[0, 90, 180, 270].map(angle => <path key={angle} transform={`rotate(${angle} 160 148)`} d="M155 104h10v30h-10z" fill="#8bebf5" />)}
-            <circle cx="160" cy="148" r="14" fill="#0b1d2c" stroke="#a0eff7" strokeWidth="3" />
-            <circle cx="160" cy="110" r="5" fill="#fff0a4" />
+            <circle cx="160" cy="148" r="52" fill="var(--diagram-surface, #16374b)" stroke="var(--diagram-stroke, #63e4f4)" strokeWidth="2" />
+            {[0, 90, 180, 270].map(angle => <path key={angle} transform={`rotate(${angle} 160 148)`} d="M155 104h10v30h-10z" fill="var(--diagram-bright, #8bebf5)" />)}
+            <circle cx="160" cy="148" r="14" fill="var(--diagram-surface, #0b1d2c)" stroke="var(--diagram-stroke, #a0eff7)" strokeWidth="3" />
+            <circle cx="160" cy="110" r="5" fill="var(--object-color, #fff0a4)" />
           </svg>
         </div>
         <p className="ml-rotation" role="status">{rotationText}</p>

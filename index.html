@@ -4,7 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="FTC робототехникасын қазақ тілінде үйренуге арналған оқу платформасы." />
-    <meta name="theme-color" content="#0a1221" />
+    <meta name="theme-color" content="#f2f6fa" />
+    <script>
+      // Run before styles/React so a saved dark preference is applied before paint.
+      (() => {
+        let theme = 'light';
+        try { if (localStorage.getItem('ftc-academy:theme:v1') === 'dark') theme = 'dark'; } catch {}
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', theme === 'dark' ? '#0a1221' : '#f2f6fa');
+      })();
+    </script>
     <link rel="icon" type="image/svg+xml" href="/src/assets/mark.svg" />
     <title>FTC Academy KZ</title>
   </head>

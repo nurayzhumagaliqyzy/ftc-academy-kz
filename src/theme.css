@@ -1,0 +1,159 @@
+/* Light palette uses semantic roles. Dark deliberately uses the original per-component
+   fallback values in each stylesheet to preserve every existing navy/cyan variant.
+   `initial` is the CSS guaranteed-invalid custom-property value, activating var() fallback.
+   To theme a new color, use var(--semantic-role, original-dark-color). */
+:root, :root[data-theme='light'] {
+  color-scheme: light;
+  --page-bg: #f2f6fa;
+  --sidebar-bg: #ffffff;
+  --panel-bg: #ffffff;
+  --surface-inset: #f2f7fb;
+  --surface-raised: #eaf2f8;
+  --surface-selected: #dff2f4;
+  --text-primary: #142d44;
+  --text-secondary: #334f66;
+  --text-muted: #526579;
+  --accent-text: #006878;
+  --accent-hover: #004e60;
+  --focus-ring: #006878;
+  --border-subtle: #c5d3df;
+  --border-control: #6c8397;
+  --border-active: #007789;
+  --button-bg: #006878;
+  --button-hover-bg: #004f60;
+  --button-text: #ffffff;
+  --input-bg: #ffffff;
+  --code-bg: #edf4f9;
+  --code-text: #124d68;
+  --code-mark-bg: #ccebf0;
+  --info-bg: #e7f1fa;
+  --info-border: #6085a4;
+  --success-bg: #e4f4ec;
+  --success-text: #175c3b;
+  --success-border: #3e8060;
+  --error-bg: #fff0f2;
+  --error-text: #902b3c;
+  --error-border: #b95568;
+  --warning-bg: #fff4d7;
+  --warning-text: #805312;
+  --warning-border: #aa7626;
+  --hero-glow: #d2eaf2;
+  --hero-start: #f7fcff;
+  --hero-end: #e4f0f6;
+  --decorative-grid: #24708a1a;
+  --decorative-shadow: #15384b18;
+  --diagram-bg: #f1f7fb;
+  --diagram-surface: #dbe9f1;
+  --diagram-metal: #7893a6;
+  --diagram-stroke: #4a718b;
+  --diagram-text: #24465b;
+  --diagram-accent: #007789;
+  --diagram-bright: #5ed4df;
+  --diagram-ink: #102d44;
+  --field-grid: #6c879a;
+  --wall-bg: #cbd8e2;
+  --wall-stripe: #b5c7d4;
+  --wall-ink: #344d61;
+  --zone-bg: #d8efe5;
+  --zone-ink: #126548;
+  --object-color: #815600;
+  --trail-color: #006f89;
+  --reverse-color: #6d3d9b;
+  --panel-shadow: 0 5px 20px #183f5a08;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page-bg: initial;
+  --sidebar-bg: initial;
+  --panel-bg: initial;
+  --surface-inset: initial;
+  --surface-raised: initial;
+  --surface-selected: initial;
+  --text-primary: initial;
+  --text-secondary: initial;
+  --text-muted: initial;
+  --accent-text: initial;
+  --accent-hover: initial;
+  --focus-ring: initial;
+  --border-subtle: initial;
+  --border-control: initial;
+  --border-active: initial;
+  --button-bg: initial;
+  --button-hover-bg: initial;
+  --button-text: initial;
+  --input-bg: initial;
+  --code-bg: initial;
+  --code-text: initial;
+  --code-mark-bg: initial;
+  --info-bg: initial;
+  --info-border: initial;
+  --success-bg: initial;
+  --success-text: initial;
+  --success-border: initial;
+  --error-bg: initial;
+  --error-text: initial;
+  --error-border: initial;
+  --warning-bg: initial;
+  --warning-text: initial;
+  --warning-border: initial;
+  --hero-glow: initial;
+  --hero-start: initial;
+  --hero-end: initial;
+  --decorative-grid: initial;
+  --decorative-shadow: initial;
+  --diagram-bg: initial;
+  --diagram-surface: initial;
+  --diagram-metal: initial;
+  --diagram-stroke: initial;
+  --diagram-text: initial;
+  --diagram-accent: initial;
+  --diagram-bright: initial;
+  --diagram-ink: initial;
+  --field-grid: initial;
+  --wall-bg: initial;
+  --wall-stripe: initial;
+  --wall-ink: initial;
+  --zone-bg: initial;
+  --zone-ink: initial;
+  --object-color: initial;
+  --trail-color: initial;
+  --reverse-color: initial;
+  --panel-shadow: none;
+}
+
+.hw-panel, .course-card { box-shadow: var(--panel-shadow); }
+
+.theme-controls { margin-top: 14px; }
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 9px 8px;
+  border: 1px solid var(--border-control, #2f4862);
+  border-radius: 8px;
+  background: var(--surface-inset, #132338);
+  color: var(--accent-text, #a0eff7);
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.theme-toggle svg { flex: none; }
+.theme-toggle:hover { background: var(--surface-selected, #17394d); }
+.theme-toggle::after {
+  content: '';
+  flex: 0 0 24px;
+  height: 14px;
+  border: 1px solid currentColor;
+  border-radius: 14px;
+  background: radial-gradient(circle at 6px 50%, currentColor 4px, transparent 4.5px);
+}
+.theme-toggle[aria-checked='true']::after {
+  background: radial-gradient(circle at 16px 50%, currentColor 4px, transparent 4.5px);
+}
+@media (max-width: 900px) {
+  .theme-controls { margin-top: 8px; }
+}
