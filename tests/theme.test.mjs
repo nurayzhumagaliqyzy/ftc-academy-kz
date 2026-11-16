@@ -135,7 +135,7 @@ test('representative preserved dark text and status pairs meet AA contrast', () 
 test('semantic roles with dark fallback behavior always include a use-site fallback', () => {
   const palette = readFileSync(new URL('../src/theme.css', import.meta.url), 'utf8')
   const fallbackRoles = new Set([...palette.matchAll(/--([\w-]+): initial;/g)].map(m => m[1]))
-  const files = ['styles.css', 'hardware/hardware.css', 'programming/MotorLab.tsx',
+  const files = ['styles.css', 'hardware/hardware.css', 'programming/MotorLab.tsx', 'simulator/simulator.css',
     ...['programming','motor','gamepad','autonomous','servo','sensor','encoder','integrated'].map(n => `programming/${n}.css`)]
   for (const file of files) {
     const source = readFileSync(new URL(`../src/${file}`, import.meta.url), 'utf8')

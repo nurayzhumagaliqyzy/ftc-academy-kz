@@ -7,6 +7,8 @@ import { applyTheme, loadTheme, normalizeTheme, saveTheme, themeStorageKey } fro
 import { HardwareModule, hardwareSectionFor } from './hardware/HardwareModule'
 import { ProgrammingModule } from './programming/ProgrammingModule'
 import { programmingLessons, programmingSectionFor } from './programming/routes'
+import { SimulatorModule } from './simulator/SimulatorModule'
+import { simulatorRoute } from './simulator/model'
 
 const iconPaths = {
   home: 'M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
@@ -69,7 +71,7 @@ const courses: Course[] = [
 
 function CourseCard({ course, index }: { course: Course; index: number }) {
   return (
-    <article className={'course-card ' + course.id} id={course.id} aria-labelledby={course.id + '-title'} tabIndex={-1}>
+    <article className={'course-card ' + course.id} id={course.id === 'simulator' ? 'simulator-course' : course.id} aria-labelledby={course.id + '-title'} tabIndex={-1}>
       <div className="card-visual" aria-hidden="true">
         <span className="card-index">МОДУЛЬ / 0{index + 1}</span>
         <div className="card-orbit"><Icon name={course.icon} size={46} /></div>
@@ -84,14 +86,15 @@ function CourseCard({ course, index }: { course: Course; index: number }) {
             <summary>Курс тақырыптары <Icon name="chevron" size={16} /></summary>
             <ul>{course.topics.map((topic) => <li key={topic}>{topic}</li>)}</ul>
           </details>
-        ) : (
-          <div className="coming-soon"><Icon name="clock" size={16} /> Жоспарда</div>
-        )}
+        ) : null}
         {course.id === 'hardware' && (
           <a className="primary-link hw-course-link" href="#hardware/explorer">FTC Hardware <Icon name="arrow" size={16} /></a>
         )}
         {course.id === 'programming' && (
           <a className="primary-link hw-course-link" href="#programming/lessons">Сабақтарды ашу <Icon name="arrow" size={16} /></a>
+        )}
+        {course.id === 'simulator' && (
+          <a className="primary-link hw-course-link" href="#simulator">Симуляторды ашу <Icon name="arrow" size={16} /></a>
         )}
       </div>
     </article>
@@ -105,7 +108,8 @@ export function App() {
   const menuButton = useRef<HTMLButtonElement>(null)
   const hardwareSection = hardwareSectionFor(active)
   const programmingSection = programmingSectionFor(active)
-  const inModule = Boolean(hardwareSection) || Boolean(programmingSection)
+  const inSimulator = simulatorRoute(active)
+  const inModule = Boolean(hardwareSection) || Boolean(programmingSection) || inSimulator
   const wasInModule = useRef(inModule)
 
   useLayoutEffect(() => applyTheme(theme), [theme])
@@ -202,6 +206,8 @@ export function App() {
             <HardwareModule section={hardwareSection} />
           ) : programmingSection ? (
             <ProgrammingModule section={programmingSection} />
+          ) : inSimulator ? (
+            <SimulatorModule />
           ) : (
             <>
               <header className="topline" id="home" tabIndex={-1}>
