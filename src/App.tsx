@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import mark from './assets/mark.svg'
 import robot from './assets/robot.svg'
+import robotLight from './assets/robot-light.svg'
+import { applyTheme, loadTheme, normalizeTheme, saveTheme, themeStorageKey } from './theme'
 import { HardwareModule, hardwareSectionFor } from './hardware/HardwareModule'
 import { ProgrammingModule } from './programming/ProgrammingModule'
 import { programmingLessons, programmingSectionFor } from './programming/routes'
@@ -16,6 +18,8 @@ const iconPaths = {
   menu: 'M4 6h16M4 12h16M4 18h16',
   close: 'm6 6 12 12M18 6 6 18',
   clock: 'M12 7v5l3 2m6-2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
+  sun: 'M12 3V1m0 22v-2M3 12H1m22 0h-2M5.6 5.6 4.2 4.2m15.6 15.6-1.4-1.4M5.6 18.4l-1.4 1.4M19.8 4.2l-1.4 1.4M17 12a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z',
+  moon: 'M21 13a9 9 0 0 1-10-10 9 9 0 1 0 10 10Z',
 } as const
 
 type IconName = keyof typeof iconPaths
@@ -95,6 +99,7 @@ function CourseCard({ course, index }: { course: Course; index: number }) {
 }
 
 export function App() {
+  const [theme, setTheme] = useState(loadTheme)
   const [active, setActive] = useState(() => window.location.hash.slice(1) || 'home')
   const [menuOpen, setMenuOpen] = useState(false)
   const menuButton = useRef<HTMLButtonElement>(null)
@@ -102,6 +107,16 @@ export function App() {
   const programmingSection = programmingSectionFor(active)
   const inModule = Boolean(hardwareSection) || Boolean(programmingSection)
   const wasInModule = useRef(inModule)
+
+  useLayoutEffect(() => applyTheme(theme), [theme])
+
+  useEffect(() => {
+    function syncTheme(event: StorageEvent) {
+      if (event.key === themeStorageKey || event.key === null) setTheme(normalizeTheme(event.newValue))
+    }
+    window.addEventListener('storage', syncTheme)
+    return () => window.removeEventListener('storage', syncTheme)
+  }, [])
 
   useEffect(() => {
     function updateActive() {
@@ -152,6 +167,20 @@ export function App() {
             <Icon name={menuOpen ? 'close' : 'menu'} />
           </button>
         </div>
+        <div className="theme-controls">
+          <button type="button" className="theme-toggle" role="switch"
+            aria-label="Қараңғы режим" aria-checked={theme === 'dark'}
+            title={theme === 'light' ? 'Қараңғы режимге ауысу' : 'Күндізгі режимге ауысу'}
+            onClick={() => {
+              const next = theme === 'light' ? 'dark' : 'light'
+              applyTheme(next)
+              setTheme(next)
+              saveTheme(next)
+            }}>
+            <Icon name={theme === 'light' ? 'sun' : 'moon'} />
+            <span>Қараңғы режим</span>
+          </button>
+        </div>
         <nav id="navigation" className={menuOpen ? 'navigation is-open' : 'navigation'} aria-label="Бүйірлік мәзір">
           <p className="nav-heading">МӘЗІР</p>
           <a href="#home" aria-current={active === 'home' ? 'location' : undefined} onClick={() => setMenuOpen(false)}>
@@ -188,7 +217,7 @@ export function App() {
                   <a className="primary-link" href="#courses">Оқу бағыттарын қарау <Icon name="arrow" size={18} /></a>
                 </div>
                 <div className="hero-art" aria-hidden="true">
-                  <img src={robot} alt="" width="570" height="420" />
+                  <img src={theme === 'light' ? robotLight : robot} alt="" width="570" height="420" />
                 </div>
               </section>
 
