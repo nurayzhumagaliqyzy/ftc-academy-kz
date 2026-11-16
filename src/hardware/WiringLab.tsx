@@ -8,8 +8,8 @@ type Feedback = { kind: 'good' | 'bad' | 'note'; text: string }
 export function WiringLab({ wiring, onChange }: { wiring: Connections; onChange: (wiring: Connections) => void }) {
   const [selected, setSelected] = useState<LeadId | null>(null)
   const [feedback, setFeedback] = useState<Feedback | null>(null)
-  const firstCableButton = useRef<HTMLButtonElement>(null)
-  const restoreCableFocus = useRef(false)
+  const cableButtons = useRef<Partial<Record<LeadId, HTMLButtonElement | null>>>({})
+  const restoreCableFocus = useRef<LeadId | null>(null)
   const wired = leadIds.flatMap(lead => {
     const port = getPort(wiring[lead])
     return port ? [{ lead, port }] : []
@@ -17,10 +17,12 @@ export function WiringLab({ wiring, onChange }: { wiring: Connections; onChange:
   const expansionComplete = Boolean(wiring['expansion-power'] && wiring['expansion-data'])
 
   useLayoutEffect(() => {
-    if (wired.length === 0 && restoreCableFocus.current) {
-      restoreCableFocus.current = false
-      firstCableButton.current?.focus({ preventScroll: true })
-      firstCableButton.current?.scrollIntoView({ block: 'nearest', behavior: 'instant' })
+    const lead = restoreCableFocus.current
+    if (lead) {
+      restoreCableFocus.current = null
+      const button = cableButtons.current[lead]
+      button?.focus({ preventScroll: true })
+      button?.scrollIntoView({ block: 'nearest', behavior: 'instant' })
     }
   }, [wired.length])
 
@@ -68,7 +70,7 @@ export function WiringLab({ wiring, onChange }: { wiring: Connections; onChange:
           <div className="hw-leads">
             {leadIds.map(id => (
               <button key={id} type="button" aria-pressed={selected === id} className="hw-lead"
-                ref={id === leadIds[0] ? firstCableButton : undefined}
+                ref={button => { cableButtons.current[id] = button }}
                 onClick={() => {
                   setSelected(id)
                   setFeedback(null)
@@ -117,7 +119,7 @@ export function WiringLab({ wiring, onChange }: { wiring: Connections; onChange:
           {wired.length > 0 && (
             <button type="button" className="hw-button hw-button-secondary" onClick={event => {
               // Keyboard and assistive activation have no pointer click count.
-              restoreCableFocus.current = event.detail === 0
+              restoreCableFocus.current = event.detail === 0 ? leadIds[0] : null
               onChange({})
               setFeedback({ kind: 'note', text: 'Барлық кабель ажыратылды.' })
             }}>Барлығын ажырату</button>
@@ -134,7 +136,10 @@ export function WiringLab({ wiring, onChange }: { wiring: Connections; onChange:
                 </svg>
                 <strong lang="en">{port.label}</strong>
                 <button type="button" className="hw-remove" aria-label={leads[lead].label + ' кабелін ажырату'}
-                  onClick={() => disconnect(lead)}>Ажырату</button>
+                  onClick={event => {
+                    restoreCableFocus.current = event.detail === 0 ? lead : null
+                    disconnect(lead)
+                  }}>Ажырату</button>
               </li>
             ))}
           </ul>
