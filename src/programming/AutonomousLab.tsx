@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import {
   advanceExecution, challenges, commandOptions, directionNames, gridSize, initialExecution, maxCommands,
 } from './autonomousModel'
@@ -41,6 +41,14 @@ export function AutonomousLab({ solved, onSolve }: { solved: readonly string[]; 
   const challenge = challenges.find(item => item.id === challengeId) ?? challenges[0]
   const [programs, setPrograms] = useState<Record<string, PathCommand[]>>({})
   const commands = programs[challenge.id] ?? []
+  const firstCommand = useRef<HTMLButtonElement>(null)
+  const restoreDeleteFocus = useRef(false)
+  useLayoutEffect(() => {
+    if (restoreDeleteFocus.current) {
+      restoreDeleteFocus.current = false
+      firstCommand.current?.focus()
+    }
+  }, [commands.length])
   const [execution, setExecution] = useState(() => initialExecution(challenges[0]))
   const locked = execution.status === 'running' || execution.status === 'paused'
   const firstStop = commands.indexOf('stop')
@@ -100,7 +108,7 @@ export function AutonomousLab({ solved, onSolve }: { solved: readonly string[]; 
       <div className="al-program">
         <h3 id="al-program-title">Пәрмендер тізбегі</h3>
         <div className="al-command-picker" aria-label="Пәрмен қосу">
-          {commandOptions.map(option => <button type="button" className="hw-button hw-button-secondary" key={option.id} disabled={locked || commands.length >= maxCommands} onClick={() => edit(previous => [...previous, option.id])}>
+          {commandOptions.map(option => <button type="button" className="hw-button hw-button-secondary" key={option.id} ref={option.id === 'forward' ? firstCommand : undefined} disabled={locked || commands.length >= maxCommands} onClick={() => edit(previous => [...previous, option.id])}>
             <b>{option.symbol} {option.label}</b><small>{option.detail}</small>
           </button>)}
         </div>
@@ -115,7 +123,10 @@ export function AutonomousLab({ solved, onSolve }: { solved: readonly string[]; 
               <div className="al-command-actions">
                 <button type="button" disabled={locked || index === 0} aria-label={`${index + 1}-пәрменді жоғары жылжыту`} onClick={() => reorder(index, -1)}>↑</button>
                 <button type="button" disabled={locked || index === commands.length - 1} aria-label={`${index + 1}-пәрменді төмен жылжыту`} onClick={() => reorder(index, 1)}>↓</button>
-                <button type="button" disabled={locked} aria-label={`${index + 1}-пәрменді жою`} onClick={() => edit(previous => previous.filter((_, i) => i !== index))}>×</button>
+                <button type="button" disabled={locked} aria-label={`${index + 1}-пәрменді жою`} onClick={event => {
+                  restoreDeleteFocus.current = event.detail === 0
+                  edit(previous => previous.filter((_, i) => i !== index))
+                }}>×</button>
               </div>
             </li>
           })}

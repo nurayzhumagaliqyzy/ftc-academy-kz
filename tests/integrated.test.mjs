@@ -66,6 +66,20 @@ test('collection requires object location and an open-to-closed transition',()=>
  for(const commands of [['forward','forward','close','stop'],['open','close','forward','forward','stop'],['open','forward','close','stop']]){const s=execute(mission,commands);assert.equal(s.status,'failed');assert.equal(s.pickedUp,false)}
  const s=execute(mission);assert.equal(s.pickedUp,true);assert.equal(s.claw,'closed');assert.deepEqual(s.object.position,s.position)
 })
+test('repeated Close keeps the carried object and gives consistent feedback before Stop',()=>{
+ const mission=m.missions[0],commands=['open','forward','forward','close','close','stop']
+ let state=m.startMission(m.initialMission(mission),commands)
+ for(let i=0;i<4;i++)state=m.advanceMission(state,commands,mission)
+ const carried=structuredClone(state)
+ state=m.advanceMission(state,commands,mission)
+ assert.equal(state.object.status,'carried');assert.equal(state.claw,'closed');assert.equal(state.pickedUp,true)
+ assert.deepEqual(state.object,carried.object);assert.deepEqual(state.position,carried.position)
+ assert.equal(state.moves,carried.moves);assert.equal(state.ticks,carried.ticks);assert.deepEqual(state.path,carried.path)
+ assert.match(state.message,/Claw затты ұстап тұр/);assert.doesNotMatch(state.message,/зат алынған жоқ/)
+ assert.equal(m.advanceMission(state,commands,mission).status,'success')
+ const empty=m.stepMission(m.initialMission(mission),['close','stop'],mission)
+ assert.equal(empty.object.status,'ground');assert.equal(empty.pickedUp,false);assert.match(empty.message,/зат алынған жоқ/)
+})
 test('carried object follows robot; off-zone drop can be recollected',()=>{
  const mission=m.missions[0],commands=['open','forward','forward','close','left','forward','open','close','stop'];let s=m.startMission(m.initialMission(mission),commands)
  for(let i=0;i<6;i++)s=m.advanceMission(s,commands,mission)

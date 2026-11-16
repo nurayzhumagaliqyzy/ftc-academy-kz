@@ -88,7 +88,9 @@ export function advanceMission(state: MissionState, commands: readonly unknown[]
       next.message = delivered ? 'Зат жеткізу аймағында босатылды. Енді Stop арқылы нәтижені тексер.' : 'Зат аймақтан тыс түсірілді. Сол ұяшықта Claw-ды жауып қайта жинауға болады.'
     }
   } else if (action === 'close') {
-    next = { ...next, claw: 'closed', message: 'Claw жабылды, бірақ зат алынған жоқ. Зат ұяшығы, open → close реті және зат күйін тексер.' }
+    next = { ...next, claw: 'closed', message: state.object.status === 'carried'
+      ? 'Claw затты ұстап тұр. Босату үшін Open Claw таңда.'
+      : 'Claw жабылды, бірақ зат алынған жоқ. Зат ұяшығы, open → close реті және зат күйін тексер.' }
     if (state.claw === 'open' && state.object.status === 'ground' && samePoint(state.position, state.object.position)) {
       next.object = { status: 'carried', position: { ...state.position } }; next.pickedUp = true; next.message = 'Зат жиналды! Claw жабық, зат роботпен бірге қозғалады.'
     }

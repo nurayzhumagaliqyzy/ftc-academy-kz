@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { advanceMission, commandLabels, editProgram, initialMission, maxMissionCommands, missions, observeDistance, pauseMission, samePoint, startMission, stepMission } from './integratedModel'
 import type { MissionCommand, MissionId, MissionState } from './integratedModel'
 const arrows = { N: '↑', E: '→', S: '↓', W: '←' }
@@ -7,6 +7,14 @@ export function IntegratedLab({ solved, onSuccess, onRetry }: { solved: MissionI
   const [missionIndex, setMissionIndex] = useState(0)
   const mission = missions[missionIndex]
   const [commands, setCommands] = useState<MissionCommand[]>([])
+  const firstCommand = useRef<HTMLButtonElement>(null)
+  const restoreDeleteFocus = useRef(false)
+  useLayoutEffect(() => {
+    if (restoreDeleteFocus.current) {
+      restoreDeleteFocus.current = false
+      firstCommand.current?.focus()
+    }
+  }, [commands.length])
   const [state, setState] = useState<MissionState>(() => initialMission(missions[0]))
   const [reducedMotion, setReducedMotion] = useState(false)
   const active = state.status === 'running'
@@ -52,8 +60,8 @@ export function IntegratedLab({ solved, onSuccess, onRetry }: { solved: MissionI
         <div className="hw-feedback" role="status" aria-live="polite" data-kind={state.status==='failed'?'bad':state.status==='success'?'good':undefined}><strong>{stateLabels[state.status]}</strong><p>{state.message}</p></div>
       </div>
       <div className="im-editor"><h3>Пәрмен редакторы · {commands.length}/{maxMissionCommands}</h3><p>Батырманы басып тізімге қос. ↑/↓ арқылы ретте. Орындау кезінде редактор жабық; үзілістегі өзгеріс модельді бастапқы күйге қайтарады.</p>
-        <div className="im-command-palette">{(Object.keys(commandLabels) as MissionCommand[]).map(command=><button type="button" className="hw-button hw-button-secondary" key={command} disabled={active||commands.length>=maxMissionCommands} onClick={()=>edit({type:'add',command})}>{commandLabels[command]}</button>)}</div>
-        <ol className="im-program" aria-label="Миссия пәрмендері">{commands.map((command,index)=><li key={index} aria-current={state.lastIndex===index?'step':undefined} data-next={!terminal&&state.nextIndex===index||undefined}><span>{index+1}. {commandLabels[command]}{state.lastIndex===index?' · соңғы орындалған':!terminal&&state.nextIndex===index?' · келесі':''}</span><div><button type="button" disabled={active||index===0} aria-label={`${index+1}-пәрменді жоғары`} onClick={()=>edit({type:'move',index,delta:-1})}>↑</button><button type="button" disabled={active||index===commands.length-1} aria-label={`${index+1}-пәрменді төмен`} onClick={()=>edit({type:'move',index,delta:1})}>↓</button><button type="button" disabled={active} aria-label={`${index+1}-пәрменді өшіру`} onClick={()=>edit({type:'delete',index})}>×</button></div></li>)}</ol>
+        <div className="im-command-palette">{(Object.keys(commandLabels) as MissionCommand[]).map(command=><button type="button" className="hw-button hw-button-secondary" key={command} ref={command==='forward'?firstCommand:undefined} disabled={active||commands.length>=maxMissionCommands} onClick={()=>edit({type:'add',command})}>{commandLabels[command]}</button>)}</div>
+        <ol className="im-program" aria-label="Миссия пәрмендері">{commands.map((command,index)=><li key={index} aria-current={state.lastIndex===index?'step':undefined} data-next={!terminal&&state.nextIndex===index||undefined}><span>{index+1}. {commandLabels[command]}{state.lastIndex===index?' · соңғы орындалған':!terminal&&state.nextIndex===index?' · келесі':''}</span><div><button type="button" disabled={active||index===0} aria-label={`${index+1}-пәрменді жоғары`} onClick={()=>edit({type:'move',index,delta:-1})}>↑</button><button type="button" disabled={active||index===commands.length-1} aria-label={`${index+1}-пәрменді төмен`} onClick={()=>edit({type:'move',index,delta:1})}>↓</button><button type="button" disabled={active} aria-label={`${index+1}-пәрменді өшіру`} onClick={event=>{restoreDeleteFocus.current=event.detail===0;edit({type:'delete',index})}}>×</button></div></li>)}</ol>
         {commands.length===0&&<p>Тізім бос. Алғашқы пәрменді жоғарыдан қос.</p>}
         <div className="im-controls"><button type="button" className="hw-button" disabled={active||terminal||!commands.length||reducedMotion} onClick={()=>setState(previous=>startMission(previous,commands))}>{state.status==='paused'?'Жалғастыру':'Run · орындау'}</button><button type="button" className="hw-button hw-button-secondary" disabled={!active} onClick={()=>setState(pauseMission)}>Pause · үзіліс</button><button type="button" className="hw-button hw-button-secondary" disabled={active||terminal||!commands.length} onClick={()=>setState(previous=>stepMission(previous,commands,mission))}>Step · бір пәрмен</button><button type="button" className="hw-button hw-button-secondary" onClick={()=>setState(initialMission(mission))}>Reset · қайта сынау</button><button type="button" className="hw-button hw-button-secondary" disabled={active||!commands.length} onClick={()=>{setCommands([]);setState(initialMission(mission))}}>Тізімді тазарту</button></div>
         {reducedMotion&&<p className="hw-note">Reduced motion қосулы: автоматты playback өшірілді. Step батырмасымен барлық миссияны орындауға болады.</p>}
