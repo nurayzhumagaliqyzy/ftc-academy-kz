@@ -1,0 +1,72 @@
+.robot-simulator .hw-banner h1 { font-size: clamp(30px, 4.4vw, 54px); line-height: 1.1; }
+.robot-simulator h2 { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.25; }
+.robot-simulator p, .robot-simulator dd, .robot-simulator button { overflow-wrap: anywhere; }
+.robot-simulator button { min-height: 44px; }
+.rs-mode-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.rs-mode-bar .hw-actions { margin: 0; }
+.rs-mode-bar > p { color: var(--text-muted, #a9b8ca); font-size: .8rem; margin: 0; }
+.rs-workspace { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.rs-control-column { display: grid; gap: 18px; min-width: 0; }
+.rs-field { display: block; width: 100%; max-width: 700px; height: auto; margin: auto; border: 2px solid var(--field-grid, #41657c); border-radius: 12px; overflow: hidden; }
+.rs-field-bg { fill: var(--diagram-bg, #0a1c2c); }
+.rs-grid-lines { fill: none; stroke: var(--field-grid, #315267); stroke-width: 1.6; }
+.rs-wall-base { fill: var(--wall-bg, #284352); }
+.rs-wall-stripe { fill: var(--wall-stripe, #193342); }
+.rs-wall-outline { stroke: var(--wall-ink, #9bb6c7); stroke-width: 2; }
+.rs-wall-cross { stroke: var(--wall-ink, #b4c9d7); fill: none; stroke-width: 5; stroke-linecap: round; }
+.rs-zone { fill: var(--zone-bg, #15463f); }
+.rs-zone-ring { stroke: var(--zone-ink, #74dfba); stroke-width: 4; fill: none; }
+.rs-zone-label { fill: var(--zone-ink, #a2f5d6); font: 700 28px var(--mono); }
+.rs-start { fill: var(--surface-selected, #153b50); stroke: var(--diagram-accent, #76d7e5); stroke-dasharray: 7 5; stroke-width: 2; }
+.rs-start-label { fill: var(--diagram-text, #b3e5ee); font: 700 26px var(--mono); }
+.rs-trail { fill: none; stroke: var(--trail-color, #59d8e8); stroke-width: 6; stroke-linejoin: round; stroke-linecap: round; }
+.rs-wheel { fill: var(--diagram-ink, #081522); stroke: var(--diagram-stroke, #b9d3df); stroke-width: 1.8; }
+.rs-robot-body { fill: var(--diagram-bright, #56d3e3); stroke: var(--diagram-accent, #b3f6ff); stroke-width: 2.5; }
+.rs-direction { fill: var(--diagram-ink, #082a3c); }
+.rs-robot-hub { fill: var(--diagram-surface, #153e53); stroke: var(--diagram-stroke, #134056); stroke-width: 2; }
+.rs-claw { fill: none; stroke: var(--diagram-accent, #a3f3ed); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+.rs-sensor { fill: var(--diagram-ink, #0a3b4b); }
+.rs-object { fill: var(--object-color, #ffdc82); stroke: var(--object-color, #ffdc82); stroke-width: 2; }
+.robot-simulator .rs-legend, .robot-simulator .rs-reset-note { margin: 12px 0; font-size: .8rem; line-height: 1.6; color: var(--text-muted, #a9b8ca); }
+.rs-trail-toggle { display: flex; align-items: center; gap: 9px; min-height: 44px; font-size: .82rem; }
+.rs-trail-toggle input { width: 20px; height: 20px; accent-color: var(--accent-text, #63e4f4); flex: none; }
+.robot-simulator .rs-state-description { border-left: 3px solid var(--accent-text, #63e4f4); padding: 9px 12px; background: var(--surface-inset, #13293d); font-size: .9rem; }
+.rs-stop { border-color: var(--error-border, #e5a3ae); }
+.rs-keypad { padding: 14px; border: 2px dashed var(--border-control, #6c9aaf); border-radius: 10px; background: var(--surface-inset, #102337); }
+.rs-keypad strong { color: var(--accent-text, #9ceaf5); font-size: .9rem; }
+.rs-keypad p { margin: 7px 0 0; font-size: .82rem; line-height: 1.6; }
+.rs-keypad:focus-visible { outline: 3px solid var(--focus-ring, #63e4f4); outline-offset: 4px; border-style: solid; }
+.rs-drive-pad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 18px auto; max-width: 420px; }
+.rs-drive-pad button { min-height: 52px; padding: 8px 4px; }
+.rs-forward { grid-area: 1 / 2; }.rs-left { grid-area: 2 / 1; }.rs-pad-stop { grid-area: 2 / 2; }.rs-right { grid-area: 2 / 3; }.rs-backward { grid-area: 3 / 2; }
+.rs-claw-controls, .rs-palette { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.rs-claw-controls button, .rs-palette button { min-width: 0; font-size: .8rem; }
+.rs-palette button { text-align: left; justify-content: flex-start; white-space: normal; }
+.rs-program { list-style: none; padding: 4px; margin: 14px -4px; max-height: 390px; overflow: auto; }
+.rs-program li { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 10px; margin: 6px 0; border: 1px solid var(--border-subtle, #345168); border-radius: 8px; font-size: .82rem; background: var(--surface-inset, #102337); }
+.rs-program li > span { flex: 1 1 140px; min-width: 0; }
+.rs-program li > div { display: flex; gap: 5px; }
+.rs-program button { width: 44px; border: 1px solid var(--border-control, #6c9aaf); border-radius: 7px; background: var(--input-bg, #142b40); color: var(--text-primary, #e1f2fc); cursor: pointer; }
+.rs-program li[aria-current] { border: 2px solid var(--border-active, #73e3ec); }
+.rs-program li[data-next] { border-style: dashed; }
+.rs-program button:disabled { opacity: .45; cursor: default; }
+.rs-values { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.rs-values > div { padding: 12px; border: 1px solid var(--border-subtle, #2c465a); border-radius: 8px; background: var(--surface-inset, #0c1d30); min-width: 0; }
+.rs-values dt { color: var(--text-muted, #abc2d5); font-size: .76rem; }
+.rs-values dd { margin: 6px 0 0; color: var(--text-primary, #e1f2fc); font-size: .9rem; font-weight: 650; font-variant-numeric: tabular-nums; }
+.rs-telemetry h2 small { font-size: .7em; font-weight: 500; }
+.rs-help { margin: 16px 0 0; }
+.rs-help summary { min-height: 44px; color: var(--accent-text, #9ceaf5); }
+.rs-help .hw-facts { margin-top: 14px; }
+@media (max-width: 1100px) {
+  .rs-workspace { grid-template-columns: minmax(0, 1fr); }
+  .rs-control-column { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+}
+@media (max-width: 760px) { .rs-control-column { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 420px) {
+  .rs-values, .rs-palette, .rs-claw-controls { grid-template-columns: minmax(0, 1fr); }
+  .rs-mode-bar .hw-actions, .rs-mode-bar .hw-button { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .robot-simulator * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
